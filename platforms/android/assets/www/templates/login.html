@@ -1,0 +1,21 @@
+<ion-view view-title="Введите имя пользователя" name="login-view">
+	<form class="form-horizontal" name="form.loginForm">
+		<ion-content class="padding">
+		<!--<div ng-controller="LoginCtrl">-->
+		<div class="list list-inset">
+		
+			<label class="item item-input">
+				<input name="login" type="text" placeholder="Имя пользователя" 
+				ng-model="user.username" >
+			</label>
+			<label name="password" class="item item-input">
+				<input type="password" placeholder="Пароль" 
+				ng-model="user.password">
+			</label>
+		<form>
+		</div>
+	<button class="button button-block button-calm" 
+	ng-click="login()" >Войти</button>
+	<!--</div>-->
+	</ion-content>
+</ion-view>
