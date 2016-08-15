@@ -209,7 +209,7 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	}
 })
 
-quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform, $) {
+quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform) {
 // 	button to set DB to default value
 	$scope.prefildDB = function(){
 		if (confirm("Очистить ДБ?")){

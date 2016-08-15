@@ -18,7 +18,7 @@ quest.run(function($ionicPlatform,  $cordovaSQLite) {
     }
     sqlplugin = $cordovaSQLite;
     db = $cordovaSQLite.openDB({name: "quest.db", location: "default"});
-    getContext();
+    //getContext();
 //    alert('DB successfully opened');
     /*$cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS tasks (id integer primary key, title varchar, content varchar, img varchar, type integer);');
     alert('Table created');

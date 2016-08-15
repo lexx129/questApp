@@ -209,7 +209,7 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	}
 })
 
-quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform, $) {
+quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform) {
 // 	button to set DB to default value
 	$scope.prefildDB = function(){
 		if (confirm("Очистить ДБ?")){
@@ -282,7 +282,8 @@ function getContext($state) {
 
       if (!confirm("Продолжить квест?"))
        // admin();
-		$state.go('login')
+// 		//$state.go('adminPanel');
+		$state.go('login');
 
       scene.startTime = result.rows.item(0).start_time;
       scene.id = result.rows.item(0).scene;
