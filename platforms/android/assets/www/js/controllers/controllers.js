@@ -96,6 +96,7 @@ quest.controller("qrCodeCtrl", function ($scope, $cordovaBarcodeScanner) {
 quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	$scope.getnextpage = function () {
 		if (!checkFirst()){
+			alert("**This page is not first**");
 			var check = new Promise((resolve, reject) => {
 				//Return true if answer is correct
 				function checks(){
@@ -150,6 +151,7 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 				// Update time in `active-scene` if we start the quest
 				$cordovaSQLite.execute(db, 'DELETE FROM `active-scene`').then(
 				function () {
+					//alert("scene id is " + scene.id);
 					var query = 'INSERT INTO `active-scene` ("scene", "current_task") VALUES (' + scene.id + ', 0)';
 					$cordovaSQLite.execute(db, query).then(
 						function () {
@@ -178,56 +180,84 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 		var query = 'SELECT `current_task`, `start_time` FROM `active-scene`';
 		$cordovaSQLite.execute(db, query).then(
 			function (result) {
-			//alert(result);
-			scene.currentTask = result.rows.item(0).current_task;
-			scene.startTime = result.rows.item(0).start_time;
-			var query = 'SELECT * FROM `scene-list` WHERE scene = "' + scene.id + '" AND `num` = "' + scene.currentTask + '"';
-			$cordovaSQLite.execute(db, query).then(
-			function (result) {
-				if (result.rows.length == 0) {
-				scene.currentTask = -1;//End quest
-				getPage();
-				return;
+				//alert(result.rows.item(0));
+				scene.currentTask = result.rows.item(0).current_task;
+				scene.startTime = result.rows.item(0).start_time;
+				alert("curr time = " + scene.currentTime);
+				var query = 'SELECT * FROM `scene-list` WHERE scene = "' + (scene.id + 1) + '" AND `num` = "' + scene.currentTask + '"';
+				//alert("query is " + query);
+				$cordovaSQLite.execute(db, query).then(
+				function (result) {
+					if (result.rows.length == 0) {
+						scene.currentTask = -1;//End quest
+						getPage();
+						return;
+					}
+					scene.task = result.rows.item(0).task;//Next task of quest
+					getPage();
+				},
+				function (err) {
+					error(err);
 				}
-				scene.task = result.rows.item(0).task;//Next task of quest
-				getPage();
+				);
 			},
 			function (err) {
 				error(err);
 			}
-			);
-			},
-			function (err) {
-			error(err);
-			}
 		);
 		},
 		function (err) {
-		error(err);
+			error(err);
 		}
 		);
 	}
 })
 
-quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform) {
+quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatform, $cordovaSQLite) {
 // 	button to set DB to default value
 	$scope.prefildDB = function(){
 		if (confirm("Очистить ДБ?")){
 			prefildDB();
 		}
 	}
+	
+	$scope.scenes = [];
+	
 	$scope.data={
+		//отображение кнопки удаления по умолчанию
 		showDelete: false
 	};
+	
+	$scope.editScene = function(scene){
+		//console.log("opened task #" + item.id);
+		alert("opened item #" + scene.id);
+		//var pages = loadPages(id);
+	};
+	
+	$scope.moveScene = function(scene, fromIndex, toIndex) {
+		//alert($scope.scenes.join('\n'));
+		$scope.scenes.splice(fromIndex, 1);
+		$scope.scenes.splice(toIndex, 0, scene);
+	};
+	
+	$scope.deleteScene = function(scene) {
+		if (confirm("Вы действительно хотите удалить сценарий '" + 
+		scene.name + "'?")){
+			var query = "DELETE from 'scene' WHERE id=" + scene.id;
+			alert("query for deleting: \n" + query);
+			$scope.scenes.splice($scope.scenes.indexOf(scene), 1);
+		}
+	};
+	
 // 	prints list of existing scenes
 	$scope.printScenes = function(){ 
-		$scope.scenes = [];
+		//$scope.scenes = [];
 		var query = 'SELECT * FROM `scene`';
 		$cordovaSQLite.execute(db, query).then(
 			function(result){
 				if (result.rows.length > 0){
 					for (var i = 0; i < result.rows.length; i++){
-						//alert(result.rows.item(i).name);
+// 						alert(result.rows.item(i).name);
 						$scope.scenes.push({
 							name: result.rows.item(i).name,
 							id: result.rows.item(i).id
@@ -264,17 +294,16 @@ quest.controller("AdminCtrl", function ($scope, $state, $ionicModal, $ionicPlatf
 		);
 	}
 	
-	$scope.editScene = function(id){
-		console.log("opened task #" + id);
-		var pages = loadPages(id);
-	}
+	
   });
 
 function getContext($state) {
   var query = "SELECT * FROM `active-scene`";
   $cordovaSQLite = sqlplugin;
-  $cordovaSQLite.execute(db, query).then(
+  var promise = $cordovaSQLite.execute(db, query).then(
     function (result) {
+	alert(result.rows);
+	alert("Length of query result" + result.rows.length);
       if (result.rows.length != 1) {
        // admin();
         return;
@@ -287,9 +316,11 @@ function getContext($state) {
 
       scene.startTime = result.rows.item(0).start_time;
       scene.id = result.rows.item(0).scene;
+	alert("active scene id is " + scene.id);
       scene.currentTask = result.rows.item(0).current_task;
 
       var query = 'SELECT * FROM `scene` WHERE `id` ="' + scene.id + '"';
+	alert("query 1 = " + query);
       $cordovaSQLite.execute(db, query).then(
         function (result) {
           if (result.rows.length != 1) {
@@ -298,11 +329,11 @@ function getContext($state) {
           }
           scene.name = result.rows.item(0).name;
           scene.time = result.rows.item(0).time;
-
+		alert("scene name = " + scene.name + "\n scene time = " + scene.time);
           document.getElementById("timer").innerHTML = formatTime(parseInt(scene.time / 60)) + ':' + formatTime(parseInt(scene.time % 60)) + ':00';
 
           var query = 'SELECT * FROM `scene-list` WHERE scene = "' + scene.id + '" AND `num` = "' + scene.currentTask + '"';
-
+		alert("query 2 = " + query);
           $cordovaSQLite.execute(db, query).then(
             function (result) {
               if (result.rows.length != 0) {

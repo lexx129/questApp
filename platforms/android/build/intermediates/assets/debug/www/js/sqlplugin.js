@@ -37,6 +37,7 @@ function prefildDB () {
         $cordovaSQLite.execute(db, 'INSERT INTO tasks (title, content, img) VALUES ("Задание 1", "Небольшой текст", "img/davinci.jpg");').then(
         $cordovaSQLite.execute(db, 'INSERT INTO tasks (title, content, img) VALUES ("Задание 2", "Ненебольшой текст", "img/davinci.jpg");').then(
         $cordovaSQLite.execute(db, 'INSERT INTO "scene" VALUES(1,"Пробный",5);').then(
+	  $cordovaSQLite.execute(db, 'INSERT INTO "scene" VALUES(2,"Крутой",10);').then(
         $cordovaSQLite.execute(db, 'INSERT INTO "answers" VALUES(1,1,"Ответик", 1);').then(
         $cordovaSQLite.execute(db, 'INSERT INTO "answers" VALUES(2,2,"Вар", 0);').then(
         $cordovaSQLite.execute(db, 'INSERT INTO "answers" VALUES(3,2,"Вар ", 1);').then(
@@ -54,9 +55,9 @@ function prefildDB () {
         $cordovaSQLite.execute(db, 'INSERT INTO "active-scene" ("scene", "current_task") VALUES(1, 0);').then(
 
           alert('Done.')
-         )))))))))))))))))
+	)))))))))))))))))
       )))))))
-    )))))));
+    ))))))));
 }
 
 
