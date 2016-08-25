@@ -40,23 +40,27 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 		templateUrl: 'templates/login.html',
 		controller: 'LoginCtrl'
 	})
+// 	Form for quest-playing
 	.state('main', {
 		url: '/quest',
 		templateUrl: 'templates/main.html',
 		controller: 'QuestCtrl'
 	})
+// 	Just an admin panel :)
 	.state('adminPanel', {
 		url: '/adminPanel',
 // 		views: {
-// 			'adminPanel': {
-			templateUrl: 'templates/adminPanel.html',
-			controller: 'AdminCtrl'
-// 			}
-// 		}
-	})
+// 			'adminPanel@': {
+		templateUrl: 'templates/adminPanel.html',
+		controller: 'AdminCtrl'
+ 	})
 	.state('sceneEditor', {
 		url: '/sceneEditor',
+		templateUrl: 'templates/sceneEditor.html',
+		controller: 'sceneEditCtrl'
 	})
+// 		}
+	
 	
 
 /*

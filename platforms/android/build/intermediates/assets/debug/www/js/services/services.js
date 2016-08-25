@@ -35,29 +35,85 @@
 			return role;}
 	};
 });
+ 
+ quest.service('SharedProps', function(){
+	 var currentScene = {
+		 id: '',
+		 name: ''
+	};
+	 var currentPage = {
+		id: '',
+		scene: '',
+		num: '',
+		title: '',
+		content: ''
+	};
+	 
+	 return {
+		getCurrScene: function(){
+			return currentScene;
+		}, 
+		getCurrPage: function(){
+			return currentPage;
+		},
+		setCurrScene: function(scene){
+			currentScene.id = scene.id;
+			currentScene.name = scene.name;
+		}, 
+		getCurrPage: function(page){
+			currentPage = page;
+		},
+	};
+});
 
- quest.service('isAdmin', function($q){
+ quest.service('pagesService', function($q, $scope, $cordovaSQLite, tasks){
 	return{
-		loginUser: function(name, pass) {
-            var deferred = $q.defer();
-            var promise = deferred.promise;
-
-            if (name.toLowerCase() == 'admin' && pass == 'admin') {
-                deferred.resolve('Yay');
-            } else {
-                deferred.reject('Nay');
-            }
-            promise.success = function(fn) {
-                promise.then(fn);
-                return promise;
-            }
-            promise.error = function(fn) {
-                promise.then(null, fn);
-                return promise;
-            }
-            return promise;
-        }
-	}
+		openPages: function(scene){
+			var deferred = $q.defer();
+			var promise = deferred.promise;
+			var query = 'SELECT * FROM `scene-list` WHERE scene = ' + scene.id;
+			alert("scene list query: \n" + query);
+			$cordovaSQLite.execute(db, query).then(
+			function(result){
+				if (result.rows.length > 0){
+					for (var i = 0; i < result.rows.length; i++){
+// 						alert(result.rows.item(i).name);
+						$scope.task.push({
+							scene: result.rows.item(i).scene,
+							num: result.rows.item(i).num
+						});
+						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
+						alert("query for task-list in page #" + result.rows.item(i).id);
+						$cordovaSQLite.execute(db, taskQuery).then(
+							function(result){
+								$scope.tasks.push({
+									id: result.rows.item(i).id,
+									title: result.rows.item(i).title,
+									content:result.rows.item(i).content			
+								});
+						}, function (err) {
+							error(err);
+						});
+					}
+				}
+				else {alert("Scene #" + scene.id + " has no pages");}
+				}, function (err){
+					error(err);
+				}
+			);
+			$state.go('sceneEditor');
+		
+		promise.success = function(fn) {
+			promise.then(fn);
+			return promise;
+		}
+		promise.error = function(fn) {
+			promise.then(null, fn);
+			return promise;
+		}
+			return promise;
+		}
+	};
 });
 
 
