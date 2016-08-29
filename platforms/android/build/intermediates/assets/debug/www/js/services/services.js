@@ -36,6 +36,9 @@
 	};
 });
  
+// **This service shares date through controlles, like
+// 		current scene on edition and etc**
+ 
  quest.service('SharedProps', function(){
 	 var currentScene = {
 		 id: '',
@@ -44,9 +47,7 @@
 	 var currentPage = {
 		id: '',
 		scene: '',
-		num: '',
-		title: '',
-		content: ''
+		num: ''
 	};
 	 
 	 return {
@@ -60,8 +61,10 @@
 			currentScene.id = scene.id;
 			currentScene.name = scene.name;
 		}, 
-		getCurrPage: function(page){
-			currentPage = page;
+		setCurrPage: function(page){
+			currentPage.id = page.id;
+			currentPage.scene = page.scene;
+			currentPage.num = page.num;
 		},
 	};
 });

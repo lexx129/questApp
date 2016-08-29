@@ -94,20 +94,27 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	$scope.getnextpage = function () {
 		if (!checkFirst()){
 			alert("**This page is not first**");
-			var check = new Promise((resolve, reject) => {
-				//Return true if answer is correct
-				function checks(){
-					if (checkAnswers())
-						resolve("result");
-				}
-				checks();
-			});
-			check.then(
-				result => {
-					//alert("This page is first");
-					getNextTask();
-				}
-			);
+// 		**Promises doesn't work on KitKat**
+			var check = checkAnswers();
+							
+			if (check){
+				alert("All answers are correct");
+				getNextTask();
+			}
+// 			var check = new Promise((resolve, reject) => {
+// 				//Return true if answer is correct
+// 				function checks(){
+// 					if (checkAnswers())
+// 						resolve("result");
+// 				}
+// 				checks();
+// 			});
+// 			check.then(
+// 				result => {
+// 					//alert("This page is first");
+// 					getNextTask();
+// 				}
+// 			);
 		}	
 	};
 
@@ -210,7 +217,7 @@ quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	}
 })
 
-quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatform, $cordovaSQLite, pages, SharedProps) {
+quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatform, $ionicModal, $cordovaSQLite, $ionicListDelegate, SharedProps) {
 // 	button to set DB to default value
 	$scope.prefildDB = function(){
 		if (confirm("Очистить ДБ?")){
@@ -218,6 +225,61 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 		}
 	}
 	
+	$ionicModal.fromTemplateUrl('templates/addNewScene.html', function($ionicModal){
+		$scope.newScene = $ionicModal;
+	},{
+		scope: $scope,
+		animation: 'slide-in-up'
+	});
+	
+	$scope.addNewScene = function(){
+		$scope.newScene.show();
+		$scope.scene = {
+			id: "",
+			name: "",
+			time: ""
+		}
+	};
+	
+	$scope.closeCreating = function(){
+	  $scope.newScene.hide();
+	}
+	$scope.confirmSceneCreate = function(scene){
+		//alert("Adding page named '" + scene.name);
+		
+// 		 var query = 'INSERT INTO `scene-stats` ("scene", "time", "status") VALUES (' + scene.id + ', ' + totalTime + ', "' + msg + '")';
+		
+		var addQuery = 'INSERT INTO `scene` ("name", "time") VALUES ("' + scene.name + '", ' + scene.time +')';
+		alert(addQuery);
+		$cordovaSQLite.execute(db, addQuery).then(
+			function(){
+				$scope.$emit('sceneAdded');
+				$state.go('adminPanel');
+				$scope.newScene.hide();
+// 				$state.go('adminPanel', {}, {reload: true});
+// 				$cordovaSQLite.execute(db, 'SELECT * FROM "scene"').then(
+// 					function(result){
+// 						for (var i = 0; i < result.rows.length; i++){
+// 							alert(result.rows.item(i).name);
+// 						}
+// 					}, function (err) {
+// 			                  error(err)
+// 						alert("Smth went wrong..");
+// 					}
+// 				);
+				
+			},
+                function (err) {
+                  error(err)
+			  //  alert("Smth went wrong..");
+                }
+		);
+	};
+	
+	$rootScope.$on('sceneAdded', function(){
+		$scope.scenes = [];
+		$scope.printScenes();
+	});
 	
 // 	$scope.scenes = Scene;
 	$scope.scenes = [];
@@ -227,20 +289,35 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 		showDelete: false
 	};
 	
+// 	$scope.addNewScene = function(){
+// 		var newScenePopup = $ionicPopup.prompt({
+// 			title: 'Введите имя нового сценария:',
+// 			template: 'Новый сценарий 1'
+// 		});
+// 		newScenePopup.then(function(res){
+// 			if (res){
+// 				var addQuery = "INSERT INTO"
+// 			}
+// 		});
+// 		var addQuery = "INSERT INTO"
+// 	};
+	
 	$scope.editScene = function(scene){
 		//console.log("opened task #" + item.id);
-		alert("opened item #" + scene.id);
+// 		alert("opened item #" + scene.id);
 		SharedProps.setCurrScene(scene);
 		//$scope.openScene(scene);
+		$ionicListDelegate.closeOptionButtons();
 		$state.go('sceneEditor');
-		alert("Scene with id " + SharedProps.getCurrScene().id + " is set to curr");
+		
+// 		alert("Scene with id " + SharedProps.getCurrScene().id + " is set to curr");
 		//var pages = loadPages(id);
 	};
 	
 	$scope.moveScene = function(scene, fromIndex, toIndex) {
 		//alert($scope.scenes.join('\n'));
-		$rootScope.scenes.splice(fromIndex, 1);
-		$rootScope.scenes.splice(toIndex, 0, scene);
+		$scope.scenes.splice(fromIndex, 1);
+		$scope.scenes.splice(toIndex, 0, scene);
 	};
 	
 	$scope.deleteScene = function(scene) {
@@ -248,7 +325,7 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 		scene.name + "'?")){
 			var query = "DELETE from 'scene' WHERE id=" + scene.id;
 			alert("query for deleting: \n" + query);
-			$rootScope.scenes.splice($rootScope.scenes.indexOf(scene), 1);
+			$scope.scenes.splice($rootScope.scenes.indexOf(scene), 1);
 		}
 	};
 	
@@ -267,7 +344,8 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 // 							$scope.scenes.sceneData.id =
 // 							result.rows.item(i).id;
 							name: result.rows.item(i).name,
-							id: result.rows.item(i).id
+							id: result.rows.item(i).id,
+							time:result.rows.item(i).time
 						});
 // 							alert("name: " + $scope.scenes.name + "\n id: " + $scope.scenes.id);
 						//});
@@ -276,7 +354,7 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 						alert("scene id: " + Scene.id + "\n scene name: " + Scene.name);
 				*/		
 					}
-					alert("num of scenes: " + $scope.scenes.length);
+// 					alert("num of scenes: " + $scope.scenes.length);
 				}
 				else {
 					console.log("No scenes found");
@@ -296,7 +374,7 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state,  $ionicPlatf
 		
   });
 
-quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaSQLite, pages, SharedProps){
+quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
 // 	var self = this;
 	$scope.pages = [];
 	
@@ -318,11 +396,11 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 		}
 		$scope.currSceneId = -1;
 	}
-	
+// 	**opens scene details (pages)**
 	$scope.openScene = function(){
 		$scope.scene = SharedProps.getCurrScene();
 // 		alert("curr scene id is " + SharedProps.getCurrScene().id);
-		alert("curr scene id is " + $scope.scene.id);
+// 		alert("curr scene id is " + $scope.scene.id);
 		var query = 'SELECT * FROM `scene-list` WHERE scene = ' + $scope.scene.id;
 // 		alert("scene list query: \n" + query);
 		$cordovaSQLite.execute(db, query).then(
@@ -337,27 +415,12 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 							num: result.rows.item(i).num
 						});
 						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
-//	**this block is for page's info**
-// 						$cordovaSQLite.execute(db, taskQuery).then(
-// 							function(result){
-// 								
-// 								$scope.pages.push({
-// 									id: result.rows.id,
-// 									title: result.rows.title,
-// 									content:result.rows.content
-// 									
-// 								});
-// 						}, function (err) {
-// 							error(err);
-// 						});
-// // 						pages.add(page);
 					}
 				}
 				else {alert("Scene #" + scene.id + " has no pages");}
 				}, function (err){
 					error(err);
-				}
-		);
+				});
 // 			$state.go('sceneEditor');
 	};
 	
@@ -365,16 +428,79 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 		alert("Trying to delete page #" + page.num);
 	};
 	$scope.editPage = function(page){
-		alert("Trying to edit page #" + page.num);
+// 		alert("Trying to edit page #" + page.num);
 		SharedProps.setCurrPage(page);
-		alert("Page of id " + SharedProps.getCurrPage.id + " is set to curr");
+		$ionicListDelegate.closeOptionButtons();
+		$state.go('pageEditor');
+// 		alert("Page of id " + SharedProps.getCurrPage.id + " is set to curr");
 	};
 	$scope.movePage = function(page, fromIndex, toIndex) {
 		//alert($scope.scenes.join('\n'));
 		$scope.pages.splice(fromIndex, 1);
 		$scope.pages.splice(toIndex, 0, page);
 	};
+	$scope.addNewPage = function(){
+		
+	}
 });
+
+quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, SharedProps){
+// 	$scope.page = SharedProps.getCurrPage();
+	$scope.tasks = [];
+	
+	$scope.data={
+		//отображение кнопки удаления по умолчанию
+		showDelete: false
+	};
+	
+	$scope.currSceneId = -1;
+	
+	$scope.addNewPage = function(){
+		$scope.sceneModal.show();
+		$scope.activeScene = {
+			name:"",
+			pages:""
+		}
+		$scope.currSceneId = -1;
+	}
+// 	**opens page's details (tasks)**
+	$scope.openTask = function(){
+		$scope.page = SharedProps.getCurrTask();
+// 		alert("curr scene id is " + SharedProps.getCurrScene().id);
+// 		alert("curr scene id is " + $scope.scene.id);
+		var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + page.id;
+		$cordovaSQLite.execute(db, taskQuery).then(
+			function(result){
+				if (result.rows.length > 0){
+					
+					$scope.tasks.push({
+						id: result.rows.id,
+						title: result.rows.title,
+						content: result.rows.content,
+						img: result.rows.img
+						
+					});
+				} else {alert("Page #" + page.id + " has no tasks");}
+			}, function (err) {
+				error(err);
+			});
+	};
+	
+	$scope.deleteTask = function(task){
+		alert("Trying to delete task #" + task.num);
+	};
+	$scope.editTask = function(task){
+		alert("Trying to edit task #" + task.num);
+		SharedProps.setCurrTask(task);
+		alert("Task of id " + SharedProps.getCurrTask.id + " is set to curr");
+	};
+	$scope.moveTask = function(task, fromIndex, toIndex) {
+		//alert($scope.scenes.join('\n'));
+		$scope.tasks.splice(fromIndex, 1);
+		$scope.tasks.splice(toIndex, 0, task);
+	};
+});
+
 
 function getContext($state) {
   var query = "SELECT * FROM `active-scene`";

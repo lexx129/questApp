@@ -4,6 +4,8 @@ var db = null,
     timerStart = false,
     answerChecked = {"correct" : false, "checked" : false},
     scene = {"name": "", "currentTask": 0, "id": 0, "startTime": 0, "endTime": 0, "task": 0};
+    
+
 
 var quest = angular.module('quest', ['ionic', 'ngCordova']);
 
@@ -58,6 +60,11 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 		url: '/sceneEditor',
 		templateUrl: 'templates/sceneEditor.html',
 		controller: 'sceneEditCtrl'
+	})
+	.state('pageEditor', {
+		url: '/pageEditor',
+		templateUrl: 'templates/pageEditor.html;',
+		controller: 'pageEditCtrl'
 	})
 // 		}
 	
