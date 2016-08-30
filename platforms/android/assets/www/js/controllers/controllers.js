@@ -289,19 +289,6 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 		showDelete: false
 	};
 	
-// 	$scope.addNewScene = function(){
-// 		var newScenePopup = $ionicPopup.prompt({
-// 			title: 'Введите имя нового сценария:',
-// 			template: 'Новый сценарий 1'
-// 		});
-// 		newScenePopup.then(function(res){
-// 			if (res){
-// 				var addQuery = "INSERT INTO"
-// 			}
-// 		});
-// 		var addQuery = "INSERT INTO"
-// 	};
-	
 	$scope.editScene = function(scene){
 		//console.log("opened task #" + item.id);
 // 		alert("opened item #" + scene.id);
@@ -339,10 +326,6 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 					for (var i = 0; i < result.rows.length; i++){
 						//alert(result.rows.item(i).name);
 						$scope.scenes.push({
-// 							$scope.scenes.sceneData.name =
-// 							result.rows.item(i).name;
-// 							$scope.scenes.sceneData.id =
-// 							result.rows.item(i).id;
 							name: result.rows.item(i).name,
 							id: result.rows.item(i).id,
 							time:result.rows.item(i).time
@@ -374,7 +357,7 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 		
   });
 
-quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
+quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
 // 	var self = this;
 	$scope.pages = [];
 	
@@ -386,8 +369,6 @@ quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ioni
 		showDelete: false
 	};
 	
-	$scope.currSceneId = -1;
-	
 	$scope.addNewScene = function(){
 		$scope.sceneModal.show();
 		$scope.activeScene = {
@@ -396,6 +377,21 @@ quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ioni
 		}
 		$scope.currSceneId = -1;
 	}
+	
+	$scope.$on('$ionicView.unloaded', function(){
+		var updateSceneInfoQuery = 'UPDATE `scene` SET "name" = "' + $scope.scene.name + '", "time" = "' + $scope.scene.time + '" WHERE "id" = ' + $scope.scene.id;
+		alert("updating current scene... \n query: " + updateSceneInfoQuery);
+		$cordovaSQLite.execute(db, updateSceneInfoQuery).then(
+			function() {
+				alert("scene info updated");
+				$rootScope.$emit('sceneAdded');
+			},
+				function(err){
+					error(err);
+				}
+		);
+	});
+	
 // 	**opens scene details (pages)**
 	$scope.openScene = function(){
 		$scope.scene = SharedProps.getCurrScene();
@@ -406,7 +402,7 @@ quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ioni
 		$cordovaSQLite.execute(db, query).then(
 			function(result){
 				if (result.rows.length > 0){
-					alert("selected scene'd have " + result.rows.length + " tasks");
+// 					alert("selected scene'd have " + result.rows.length + " tasks");
 					for (var i = 0; i < result.rows.length; i++){
 						var page = [];
 	// 						alert(result.rows.item(i).name);
@@ -417,7 +413,7 @@ quest.controller("sceneEditCtrl", function($scope, $state, $cordovaSQLite, $ioni
 						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
 					}
 				}
-				else {alert("Scene #" + scene.id + " has no pages");}
+				else {alert("Scene #" + result.rows.item(i).id + " has no pages");}
 				}, function (err){
 					error(err);
 				});

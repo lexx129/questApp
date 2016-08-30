@@ -42,7 +42,8 @@
  quest.service('SharedProps', function(){
 	 var currentScene = {
 		 id: '',
-		 name: ''
+		 name: '',
+		 time: ''
 	};
 	 var currentPage = {
 		id: '',
@@ -60,6 +61,7 @@
 		setCurrScene: function(scene){
 			currentScene.id = scene.id;
 			currentScene.name = scene.name;
+			currentScene.time = scene.time;
 		}, 
 		setCurrPage: function(page){
 			currentPage.id = page.id;
