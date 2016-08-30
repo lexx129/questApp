@@ -378,18 +378,33 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 		$scope.currSceneId = -1;
 	}
 	
+// 	**Event, that updates edited scene info and fires sceneList refresh if
+// 		needed**
 	$scope.$on('$ionicView.unloaded', function(){
-		var updateSceneInfoQuery = 'UPDATE `scene` SET "name" = "' + $scope.scene.name + '", "time" = "' + $scope.scene.time + '" WHERE "id" = ' + $scope.scene.id;
-		alert("updating current scene... \n query: " + updateSceneInfoQuery);
-		$cordovaSQLite.execute(db, updateSceneInfoQuery).then(
-			function() {
-				alert("scene info updated");
-				$rootScope.$emit('sceneAdded');
-			},
-				function(err){
-					error(err);
-				}
+		var checkQuery = 'SELECT * FROM `scene` WHERE "id" = ' + $scope.scene.id;
+		$cordovaSQLite.execute(db, checkQuery).then(
+			function(result){
+				var currName = result.rows.item(0).name;
+				var currTime = result.rows.item(0).time;
+				var updateSceneInfoQuery = 'UPDATE `scene` SET "name" = "' + $scope.scene.name + '", "time" = "' + $scope.scene.time + '" WHERE "id" = ' + $scope.scene.id;
+				if (currName != $scope.scene.name || currTime != $scope.scene.time){
+// 					alert("updating current scene... \n query: " + updateSceneInfoQuery);
+					$cordovaSQLite.execute(db, updateSceneInfoQuery).then(
+						function() {
+							alert("scene info updated");
+							$rootScope.$emit('sceneAdded');
+						},
+						function(err){
+							error(err);
+						}		
+					);
+				} /*else {
+					alert("No need to refresh sceneList");
+				}*/
+			}
 		);
+		
+		
 	});
 	
 // 	**opens scene details (pages)**

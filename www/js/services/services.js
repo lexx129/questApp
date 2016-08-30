@@ -43,7 +43,8 @@
 	 var currentScene = {
 		 id: '',
 		 name: '',
-		 time: ''
+		 time: '',
+		 changed: false
 	};
 	 var currentPage = {
 		id: '',
