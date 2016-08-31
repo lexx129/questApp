@@ -10,8 +10,8 @@
 		</div>
 			<h1 class="title">AdminPanel</h1>
 		<div class="buttons">
-			<button class="button button-stable"
-			ng-click="data.showDelete = false; data.showReorder = !data.showReorder">Переместить</button>
+			<!--<button class="button button-stable"
+			ng-click="data.showDelete = false; data.showReorder = !data.showReorder">Переместить</button>-->
 		</div>
   </ion-header-bar>
   <ion-view view-title="AdminPanel" name="admin" ng-init="printScenes()">
@@ -25,7 +25,7 @@
 			<ion-item ng-repeat="scene in scenes">
 				<ion-delete-button class="ion-minus-circled" ng-click="deleteScene(scene)"></ion-delete-button>
 				<ion-option-button class="button-assertive" ng-click="editScene(scene)">Изменить</ion-option-button>
-				<ion-reorder-button class="ion-navicon" on-reorder="moveScene(scene, $fromIndex, $toIndex)"></ion-reorder-button>
+				<!--<ion-reorder-button class="ion-navicon" on-reorder="moveScene(scene, $fromIndex, $toIndex)"></ion-reorder-button>-->
 				<span class="title">{{"[" + scene.id +"]" + scene.name}}</span>
 			</ion-item>
 		</ion-list>

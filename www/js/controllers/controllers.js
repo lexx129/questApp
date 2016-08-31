@@ -1,6 +1,31 @@
 //angular.module('quest').controller(quest.controllers, ['ngCordova'])
 
-quest.controller('QuestCtrl', function ($scope, $ionicPlatform) {
+quest.controller('QuestCtrl', function ($scope, $state, $ionicPlatform) {
+	
+	$scope.scenes = [];
+	
+	$scope.printScenes = function(){ 
+		var query = 'SELECT * FROM `scene`';
+		$cordovaSQLite.execute(db, query).then(
+			function(result){
+				if (result.rows.length > 0){
+					for (var i = 0; i < result.rows.length; i++){
+						//alert(result.rows.item(i).name);
+						$scope.scenes.push({
+							name: result.rows.item(i).name,
+							id: result.rows.item(i).id,
+							time:result.rows.item(i).time
+						});
+					}
+				}
+				else {
+					console.log("No scenes found");
+				}
+			}, function (err) {
+				error(err);
+			}
+		);
+	};
 })
 
 // factories for objects with scenes and pages in these scenes
@@ -93,7 +118,7 @@ quest.controller("qrCodeCtrl", function ($scope, $cordovaBarcodeScanner) {
 quest.controller("NextCtrl", function ($scope, $cordovaSQLite) {
 	$scope.getnextpage = function () {
 		if (!checkFirst()){
-			alert("**This page is not first**");
+// 			alert("**This page is not first**");
 // 		**Promises doesn't work on KitKat**
 			var check = checkAnswers();
 							
@@ -245,10 +270,6 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 	  $scope.newScene.hide();
 	}
 	$scope.confirmSceneCreate = function(scene){
-		//alert("Adding page named '" + scene.name);
-		
-// 		 var query = 'INSERT INTO `scene-stats` ("scene", "time", "status") VALUES (' + scene.id + ', ' + totalTime + ', "' + msg + '")';
-		
 		var addQuery = 'INSERT INTO `scene` ("name", "time") VALUES ("' + scene.name + '", ' + scene.time +')';
 		alert(addQuery);
 		$cordovaSQLite.execute(db, addQuery).then(
@@ -309,16 +330,23 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 	
 	$scope.deleteScene = function(scene) {
 		if (confirm("Вы действительно хотите удалить сценарий '" + 
-		scene.name + "'?")){
-			var query = "DELETE from 'scene' WHERE id=" + scene.id;
-			alert("query for deleting: \n" + query);
-			$scope.scenes.splice($rootScope.scenes.indexOf(scene), 1);
+		scene.name + "' вместе со всем содержимым?")){
+			var sceneDeleteQuery = "DELETE from 'scene' WHERE id=" + scene.id;
+// 			alert("query for deleting: \n" + query);
+			$cordovaSQLite.execute(db, sceneDeleteQuery).then(
+				function(){
+					var cleanUp
+					$scope.scenes.splice($scope.scenes.indexOf(scene), 1);
+				}, function(err){
+					error(err);
+				}
+			);
+			
 		}
 	};
 	
-// 	prints list of existing scenes
+// 	**prints list of existing scenes**
 	$scope.printScenes = function(){ 
-		//$scope.scenes = [];
 		var query = 'SELECT * FROM `scene`';
 		$cordovaSQLite.execute(db, query).then(
 			function(result){
@@ -330,14 +358,7 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 							id: result.rows.item(i).id,
 							time:result.rows.item(i).time
 						});
-// 							alert("name: " + $scope.scenes.name + "\n id: " + $scope.scenes.id);
-						//});
-				/*		Scene.id = result.rows.item(i).id;
-						Scene.name = result.rows.item(i).name;
-						alert("scene id: " + Scene.id + "\n scene name: " + Scene.name);
-				*/		
 					}
-// 					alert("num of scenes: " + $scope.scenes.length);
 				}
 				else {
 					console.log("No scenes found");
@@ -347,36 +368,51 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 			}
 		);
 	}
-	
-// 	var self = this;
-// 	self.pages = pages.list;
-	
-	//$rootScope.pages = [];
-	
-	
-		
   });
 
 quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
 // 	var self = this;
 	$scope.pages = [];
 	
-//	$scope.scenes = Scene;
-//	alert($scope.pages.length);
-	
 	$scope.data={
 		//отображение кнопки удаления по умолчанию
 		showDelete: false
 	};
 	
-	$scope.addNewScene = function(){
-		$scope.sceneModal.show();
-		$scope.activeScene = {
-			name:"",
-			pages:""
-		}
-		$scope.currSceneId = -1;
+	$scope.addNewPage = function(){
+		var query = 'SELECT * from `scene-list` WHERE "scene" = ' + $scope.scene.id;
+		$cordovaSQLite.execute(db, query).then(
+			function(result){
+				var maxNum = -1;
+				for (var i = 0; i < $scope.pages.length; i++){
+					if ($scope.pages[i].num > maxNum)
+						maxNum = $scope.pages[i].num;
+				}
+				var length = result.rows.length;
+// 				alert(length + " pages found");
+				if (length == 0){
+					var maxNum = 0;
+				}
+				var addNewPageQuery = 'INSERT INTO `scene-list` ("scene", "num") VALUES (' + $scope.scene.id + ', ' + (maxNum+1) +')';
+// 					alert(addNewPageQuery);
+				$cordovaSQLite.execute(db, addNewPageQuery).then(
+					function(){
+						$scope.$emit('pageAdded');
+						$state.go('sceneEditor');
+					}, function(err){
+						error(err);
+					}
+				);					
+			
+			}, function(err){
+				error(err);
+			}
+		);
 	}
+	$rootScope.$on('pageAdded', function(){
+		$scope.pages = [];
+		$scope.openScene();
+	});
 	
 // 	**Event, that updates edited scene info and fires sceneList refresh if
 // 		needed**
@@ -419,16 +455,15 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 				if (result.rows.length > 0){
 // 					alert("selected scene'd have " + result.rows.length + " tasks");
 					for (var i = 0; i < result.rows.length; i++){
-						var page = [];
-	// 						alert(result.rows.item(i).name);
 						$scope.pages.push({
+							id: result.rows.item(i).id,
 							scene: result.rows.item(i).scene,
 							num: result.rows.item(i).num
 						});
 						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
 					}
 				}
-				else {alert("Scene #" + result.rows.item(i).id + " has no pages");}
+// 				else {alert("Scene #" + result.rows.item(i).id + " has no pages");}
 				}, function (err){
 					error(err);
 				});
@@ -436,7 +471,25 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 	};
 	
 	$scope.deletePage = function(page){
-		alert("Trying to delete page #" + page.num);
+// 		alert("Trying to delete page #" + page.num);
+		if(confirm("Вы действительно хотите удалить страницу " + page.num + " вместе со всем содержимым?")){
+			var deletePageQuery = 'DELETE from `scene-list` WHERE "scene" = ' + page.scene + ' AND "num" = ' + page.num;
+			$cordovaSQLite.execute(db, deletePageQuery).then(
+				function(){
+					$scope.pages.splice($scope.pages.indexOf(page), 1);
+					var updatePagesNumbers = 'UPDATE `scene-list` SET "num" = num - 1 WHERE "num" >' + page.num;
+					$cordovaSQLite.execute(db, updatePagesNumbers).then(
+						function(){
+							$scope.$emit('pageAdded');
+						}, function(err){
+							error(err);
+						}
+					);
+				}, function(err){
+					error(err);
+				}
+			);
+		}
 	};
 	$scope.editPage = function(page){
 // 		alert("Trying to edit page #" + page.num);
@@ -447,12 +500,28 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 	};
 	$scope.movePage = function(page, fromIndex, toIndex) {
 		//alert($scope.scenes.join('\n'));
-		$scope.pages.splice(fromIndex, 1);
-		$scope.pages.splice(toIndex, 0, page);
-	};
-	$scope.addNewPage = function(){
+// 		alert("first num: " + $scope.pages[fromIndex].num + "\n second num: " + $scope.pages[toIndex].num);
 		
-	}
+// 		**we need to swap pages' nums too before splicing them!**
+		var updateFirst = 'UPDATE `scene-list` SET "num" = ' + $scope.pages[toIndex].num + ' WHERE "id" = ' + $scope.pages[fromIndex].id;
+		var updateSecond = 'UPDATE `scene-list` SET "num" = ' + $scope.pages[fromIndex].num + ' WHERE "id" = ' + $scope.pages[toIndex].id;
+		$cordovaSQLite.execute(db, updateFirst).then(
+			function(){
+				$cordovaSQLite.execute(db, updateSecond).then(
+					function(){
+						$scope.pages.splice(fromIndex, 1);
+						$scope.pages.splice(toIndex, 0, page);
+					},
+					function(err){error(err);}
+				);
+			},function(err){
+				error(err);
+			}
+		);
+		alert(updateFirst + '\n *** \n' + updateSecond);
+// 		
+	};
+	
 });
 
 quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, SharedProps){
