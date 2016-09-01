@@ -99,8 +99,6 @@ quest.controller('LoginCtrl', function($scope, LoginService, $ionicPlatform, $io
 // 		"', using pswd '" + $scope.user.password);
 });
 
-
-
 quest.controller("qrCodeCtrl", function ($scope, $cordovaBarcodeScanner) {
 	$scope.scanBarcode = function () {
 		$cordovaBarcodeScanner.scan().then(function (imageData) {
@@ -277,18 +275,6 @@ quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatfo
 				$scope.$emit('sceneAdded');
 				$state.go('adminPanel');
 				$scope.newScene.hide();
-// 				$state.go('adminPanel', {}, {reload: true});
-// 				$cordovaSQLite.execute(db, 'SELECT * FROM "scene"').then(
-// 					function(result){
-// 						for (var i = 0; i < result.rows.length; i++){
-// 							alert(result.rows.item(i).name);
-// 						}
-// 					}, function (err) {
-// 			                  error(err)
-// 						alert("Smth went wrong..");
-// 					}
-// 				);
-				
 			},
                 function (err) {
                   error(err)
@@ -458,7 +444,8 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 						$scope.pages.push({
 							id: result.rows.item(i).id,
 							scene: result.rows.item(i).scene,
-							num: result.rows.item(i).num
+							num: result.rows.item(i).num,
+							task: result.rows.item(i).task
 						});
 						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
 					}
@@ -526,14 +513,12 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 
 quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, SharedProps){
 // 	$scope.page = SharedProps.getCurrPage();
-	$scope.tasks = [];
+	$scope.task = [];
 	
 	$scope.data={
 		//отображение кнопки удаления по умолчанию
 		showDelete: false
 	};
-	
-	$scope.currSceneId = -1;
 	
 	$scope.addNewPage = function(){
 		$scope.sceneModal.show();
@@ -543,33 +528,37 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, Shared
 		}
 		$scope.currSceneId = -1;
 	}
-// 	**opens page's details (tasks)**
-	$scope.openTask = function(){
-		$scope.page = SharedProps.getCurrTask();
-// 		alert("curr scene id is " + SharedProps.getCurrScene().id);
-// 		alert("curr scene id is " + $scope.scene.id);
-		var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + page.id;
+	
+// 	**opens page's details (task)**
+	$scope.openPage = function(){
+		$scope.page = SharedProps.getCurrPage();
+		var taskQuery = 'SELECT * FROM  `tasks` WHERE "id" = "' + $scope.page.task + '"';
+		alert("find page contents query: \n" + taskQuery);
 		$cordovaSQLite.execute(db, taskQuery).then(
 			function(result){
+				//alert(1);
 				if (result.rows.length > 0){
-					
-					$scope.tasks.push({
-						id: result.rows.id,
-						title: result.rows.title,
-						content: result.rows.content,
-						img: result.rows.img
-						
+					$scope.task.push({
+						id: result.rows.item(0).id,
+						title: result.rows.item(0).title,
+						content: result.rows.item(0).content,
+						img: result.rows.item(0).img
 					});
-				} else {alert("Page #" + page.id + " has no tasks");}
+					
+				} else {alert("Page #" + page.id + " has no tasks on it.");}
+			
+				alert("query task title: " + result.rows.item(0).title + "\n variable task title: " + $scope.task.title);
+					alert($scope.task.id + " " + $scope.task.title + " " + $scope.task.content);
 			}, function (err) {
 				error(err);
-			});
+			}
+		);
 	};
 	
-	$scope.deleteTask = function(task){
+	/*$scope.deletePage = function(task){
 		alert("Trying to delete task #" + task.num);
 	};
-	$scope.editTask = function(task){
+	$scope.editPage = function(task){
 		alert("Trying to edit task #" + task.num);
 		SharedProps.setCurrTask(task);
 		alert("Task of id " + SharedProps.getCurrTask.id + " is set to curr");
@@ -578,70 +567,71 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, Shared
 		//alert($scope.scenes.join('\n'));
 		$scope.tasks.splice(fromIndex, 1);
 		$scope.tasks.splice(toIndex, 0, task);
-	};
+	};*/
 });
 
 
 function getContext($state) {
-  var query = "SELECT * FROM `active-scene`";
-  $cordovaSQLite = sqlplugin;
-  var promise = $cordovaSQLite.execute(db, query).then(
-    function (result) {
-	alert(result.rows);
-	alert("Length of query result" + result.rows.length);
-      if (result.rows.length != 1) {
-       // admin();
-        return;
-      }
+	var query = "SELECT * FROM `active-scene`";
+	alert(query);
+	$cordovaSQLite = sqlplugin;
+	var promise = $cordovaSQLite.execute(db, query).then(
+		function (result) {
+			alert(result.rows);
+			alert("Length of query result" + result.rows.length);
+			if (result.rows.length != 1) {
+				// admin();
+				return;
+			}
 
-      if (!confirm("Продолжить квест?"))
-       // admin();
-// 		//$state.go('adminPanel');
-		$state.go('login');
+			if (!confirm("Продолжить квест?"))
+				// admin();
+			// 		//$state.go('adminPanel');
+				$state.go('login');
 
-      scene.startTime = result.rows.item(0).start_time;
-      scene.id = result.rows.item(0).scene;
-	alert("active scene id is " + scene.id);
-      scene.currentTask = result.rows.item(0).current_task;
+			scene.startTime = result.rows.item(0).start_time;
+			scene.id = result.rows.item(0).scene;
+			alert("active scene id is " + scene.id);
+			scene.currentTask = result.rows.item(0).current_task;
 
-      var query = 'SELECT * FROM `scene` WHERE `id` ="' + scene.id + '"';
-	alert("query 1 = " + query);
-      $cordovaSQLite.execute(db, query).then(
-        function (result) {
-          if (result.rows.length != 1) {
-            alert('Scene !exists');
-            return;
-          }
-          scene.name = result.rows.item(0).name;
-          scene.time = result.rows.item(0).time;
-		alert("scene name = " + scene.name + "\n scene time = " + scene.time);
-          document.getElementById("timer").innerHTML = formatTime(parseInt(scene.time / 60)) + ':' + formatTime(parseInt(scene.time % 60)) + ':00';
+			var query = 'SELECT * FROM `scene` WHERE `id` ="' + scene.id + '"';
+			alert("query 1 = " + query);
+			$cordovaSQLite.execute(db, query).then(
+				function (result) {
+				if (result.rows.length != 1) {
+				alert('Scene !exists');
+				return;
+				}
+				scene.name = result.rows.item(0).name;
+				scene.time = result.rows.item(0).time;
+				alert("scene name = " + scene.name + "\n scene time = " + scene.time);
+				document.getElementById("timer").innerHTML = formatTime(parseInt(scene.time / 60)) + ':' + formatTime(parseInt(scene.time % 60)) + ':00';
 
-          var query = 'SELECT * FROM `scene-list` WHERE scene = "' + scene.id + '" AND `num` = "' + scene.currentTask + '"';
-		alert("query 2 = " + query);
-          $cordovaSQLite.execute(db, query).then(
-            function (result) {
-              if (result.rows.length != 0) {
-                scene.task = result.rows.item(0).task;
-              }
-              getPage();
-            },
-            function (err) {
-              error(err);
-            }
-          );
-        },
-        function (err) {
-          error(err);
-        }
-      );
-    },
-    function (err) {
-      prefildDB();
-      error(' db !exists ' + err);
-      getContext();
-    }
-  );
+				var query = 'SELECT * FROM `scene-list` WHERE scene = "' + scene.id + '" AND `num` = "' + scene.currentTask + '"';
+				alert("query 2 = " + query);
+				$cordovaSQLite.execute(db, query).then(
+				function (result) {
+					if (result.rows.length != 0) {
+					scene.task = result.rows.item(0).task;
+					}
+					getPage();
+				},
+				function (err) {
+					error(err);
+				}
+				);
+				},
+				function (err) {
+				error(err);
+				}
+			);
+		},
+		function (err) {
+			prefildDB();
+			error(' db !exists ' + err);
+			getContext();
+		}
+	);
 }
 
 function getPage(status) {

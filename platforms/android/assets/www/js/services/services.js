@@ -49,7 +49,21 @@
 	 var currentPage = {
 		id: '',
 		scene: '',
-		num: ''
+		num: '',
+		task: ''
+	};
+	var currentTask = {
+		id: '',
+		title: '',
+		content: '',
+		img: ''
+	};
+	var currentQuestion = {
+		id: '',
+		task: '',
+		number: '',
+		type: '',
+		question: ''
 	};
 	 
 	 return {
@@ -58,6 +72,12 @@
 		}, 
 		getCurrPage: function(){
 			return currentPage;
+		},
+		getCurrTask: function(){
+			return currentTask;
+		},
+		getCurrQuestion: function(){
+			return currentQuestion;
 		},
 		setCurrScene: function(scene){
 			currentScene.id = scene.id;
@@ -68,7 +88,21 @@
 			currentPage.id = page.id;
 			currentPage.scene = page.scene;
 			currentPage.num = page.num;
+			currentPage.task = page.task;
 		},
+		setCurrTask: function(task){
+			currentTask.id = task.id;
+			currentTask.title = task.title;
+			currentTask.content = task.content;
+			currentTask.img = task.img;
+		},
+		setCurrQuestion: function(question){
+			currentQuestion.id = question.id;
+			currentQuestion.task = question.task;
+			currentQuestion.number = question.number;
+			currentQuestion.type = question.type;
+			currentQuestion.question = question.question;
+		}
 	};
 });
 

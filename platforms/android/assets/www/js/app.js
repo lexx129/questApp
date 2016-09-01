@@ -63,7 +63,7 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 	})
 	.state('pageEditor', {
 		url: '/pageEditor',
-		templateUrl: 'templates/pageEditor.html;',
+		templateUrl: 'templates/pageEditor.html',
 		controller: 'pageEditCtrl'
 	})
 // 		}

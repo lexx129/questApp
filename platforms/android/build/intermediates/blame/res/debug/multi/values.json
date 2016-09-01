@@ -11,14 +11,7 @@
                     "endOffset": 114
                 },
                 "from": {
-                    "file": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/values/strings.xml",
-                    "position": {
-                        "startLine": 4,
-                        "startColumn": 4,
-                        "startOffset": 162,
-                        "endColumn": 63,
-                        "endOffset": 221
-                    }
+                    "file": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/values/strings.xml"
                 }
             },
             {
@@ -26,8 +19,8 @@
                     "startLine": 3,
                     "startColumn": 4,
                     "startOffset": 119,
-                    "endColumn": 47,
-                    "endOffset": 162
+                    "endColumn": 45,
+                    "endOffset": 160
                 },
                 "from": {
                     "file": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/values/strings.xml",
@@ -35,8 +28,8 @@
                         "startLine": 2,
                         "startColumn": 4,
                         "startOffset": 55,
-                        "endColumn": 47,
-                        "endOffset": 98
+                        "endColumn": 45,
+                        "endOffset": 96
                     }
                 }
             },
@@ -44,19 +37,12 @@
                 "to": {
                     "startLine": 4,
                     "startColumn": 4,
-                    "startOffset": 167,
+                    "startOffset": 165,
                     "endColumn": 58,
-                    "endOffset": 221
+                    "endOffset": 219
                 },
                 "from": {
-                    "file": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/values/strings.xml",
-                    "position": {
-                        "startLine": 3,
-                        "startColumn": 4,
-                        "startOffset": 103,
-                        "endColumn": 58,
-                        "endOffset": 157
-                    }
+                    "file": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/values/strings.xml"
                 }
             }
         ]

@@ -4,9 +4,9 @@ ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml
 	android:hardwareAccelerated
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:11-45
 	xmlns:android
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:144-202
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:136-194
 	package
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:98-143
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:98-135
 		INJECTED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml
 		INJECTED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml
 	android:versionName
@@ -45,7 +45,7 @@ ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:5:53-82
 	android:hardwareAccelerated
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:5:18-52
-activity#com.ionicframework.somesqlapp634703.MainActivity
+activity#com.ionicframework.questApp.MainActivity
 ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:6:9-11:20
 	android:windowSoftInputMode
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:6:257-299
