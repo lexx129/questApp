@@ -2,8 +2,8 @@ var db = null,
     sqlplugin = null,
     UTCShift = 3*60*60,
     timerStart = false,
-    answerChecked = {"correct" : false, "checked" : false},
-    scene = {"name": "", "currentTask": 0, "id": 0, "startTime": 0, "endTime": 0, "task": 0};
+    answerChecked = {"correct" : false, "checked" : false};
+//     scene = {"name": "", "currentTask": 0, "id": 0, "startTime": 0, "endTime": 0, "task": 0};
     
 
 
@@ -42,12 +42,21 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 		templateUrl: 'templates/login.html',
 		controller: 'LoginCtrl'
 	})
+	
+// 	From for initial scene choosing
+	.state('sceneChooser',{
+		url: '/sceneChooser',
+		templateUrl: 'templates/sceneChooser.html',
+		controller: 'sceneChooseCtrl'
+	})
+	
 // 	Form for quest-playing
 	.state('main', {
 		url: '/quest',
 		templateUrl: 'templates/main.html',
 		controller: 'QuestCtrl'
 	})
+	
 // 	Just an admin panel :)
 	.state('adminPanel', {
 		url: '/adminPanel',
@@ -56,11 +65,13 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 		templateUrl: 'templates/adminPanel.html',
 		controller: 'AdminCtrl'
  	})
+	
 	.state('sceneEditor', {
 		url: '/sceneEditor',
 		templateUrl: 'templates/sceneEditor.html',
 		controller: 'sceneEditCtrl'
 	})
+	
 	.state('pageEditor', {
 		url: '/pageEditor',
 		templateUrl: 'templates/pageEditor.html',
