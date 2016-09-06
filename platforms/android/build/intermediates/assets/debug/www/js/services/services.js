@@ -102,6 +102,7 @@
 			currentQuestion.number = question.number;
 			currentQuestion.type = question.type;
 			currentQuestion.question = question.question;
+			currentQuestion.answer = question.answer;
 		}
 	};
 });

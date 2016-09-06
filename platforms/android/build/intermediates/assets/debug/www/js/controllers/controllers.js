@@ -1,15 +1,15 @@
 //angular.module('quest').controller(quest.controllers, ['ngCordova'])
 
-quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPlatform) {
+quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPlatform, $cordovaBarcodeScanner) {
 	
 	$scope.scene={
-		id: '',
-		time: '',
-		startTime: '',
-		endTime: '',
+		id: 		'',
+		time: 	'',
+		startTime:	'',
+		endTime: 	'',
 		currentTask: '',
-		name: '',
-		task: ''
+		name: 	'',
+		task: 	''
 	};
 
 	$scope.getContext = function() {
@@ -17,7 +17,8 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		var promise = $cordovaSQLite.execute(db, query).then(
 			function (result) {
 				if (result.rows.length != 1) {
-					//$state.go('sceneChooser');
+					alert("there're more then 1 active scene now");
+					$state.go('sceneChooser');
 					return;
 				}				
 				$scope.scene.startTime = result.rows.item(0).start_time;
@@ -27,7 +28,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 				alert("\nactive scene id is " + $scope.scene.id);
 
 				if ($scope.scene.currentTask != 0 && !confirm("Продолжить квест?"))
-					$state.go('login');
+					$state.go('sceneChooser');
 				
 				var query = 'SELECT * FROM `scene` WHERE `id` ="' + $scope.scene.id + '"';
 // 				alert("query 1 = " + query);
@@ -70,7 +71,6 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 	}
 	
 	function getPage(status) {
-		$cordovaSQLite = sqlplugin;
 		alert('currentTask ' + $scope.scene.currentTask + '  scene.id ' + $scope.scene.id);
 
 		if ($scope.scene.currentTask == -1) {
@@ -127,81 +127,10 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 			function (result) {
 				$('#question').html("");
 				for (var i = 0; i < result.rows.length; i++) {
-				var html = '';
-				switch (result.rows.item(i).type) {
-					case 1 :
-					{
-					var query = 'SELECT * FROM `answers` WHERE `question` = ' + result.rows.item(i).id + ' AND `valid` = "1";';
-					var question = {"id": result.rows.item(i).id, "text": result.rows.item(i).question};
-					$cordovaSQLite.execute(db, query).then(
-					function (result) {
-						var html = question.text + ' <input type="text" name="question-' + question.id +
-						'" value="" answer="' + result.rows.item(0).answer + '" required />';
-						formatQuestion(html);
-					},
-					function (err) {
-						error(err)
-					}
-					);
-					break;// simple text field
-					}
-					case 2 :
-					{
-					var query = 'SELECT * FROM `answers` WHERE `question` = ' + result.rows.item(i).id + ' AND `valid` = "1";';
-					var question = {"id": result.rows.item(i).id, "text": result.rows.item(i).question};
-					$cordovaSQLite.execute(db, query).then(
-					function (result) {
-						var html = '';
-						html = ' <input type="checkbox" name="question-' + question.id +
-						'" value="" answer="' + result.rows.item(0).valid + '" required /> ' + question.text;
-						formatQuestion(html);
-					},
-					function (err) {
-						error(err)
-					}
-					);
-					break;// checkboxes
-					}
-					case 3 :
-					{
-					var query = 'SELECT * FROM `answers` WHERE `question` = ' + result.rows.item(i).id;
-					var question = {"id": result.rows.item(i).id, "text": result.rows.item(i).question};
-					$cordovaSQLite.execute(db, query).then(
-						function (result) {
-							var html = '',
-							answer = '';
-							for (var i = 0; i < result.rows.length; i++) {
-								html += '<option>' + result.rows.item(i).answer + '</option>';
-								if (result.rows.item(i).valid == 1)
-									answer = result.rows.item(i).answer;
-							}
-							html = question.text + '<select name="question-' + question.id + '" answer="' + answer + '" required>' + html + '</select>';
-							formatQuestion(html);
-						},
-						function (err) {
-							error(err)
-						}
-					);
-					break;// SELECT
-					}
-					case 4 :
-					{
-					var query = 'SELECT * FROM `answers` WHERE `question` = ' + result.rows.item(i).id + ' AND `valid` = "1";';
-					var question = {"id": result.rows.item(i).id, "text": result.rows.item(i).question};
-					$cordovaSQLite.execute(db, query).then(
-					function (result) {
-						var html = '';
-						html = '<button type="button" id="QR" name="question-' + question.id + '" answer="' + result.rows.item(0).answer + '" required>Scan QR</button>';
-						formatQuestion(html);
-					},
-					function (err) {
-						error(err)
-					}
-					);
-					break;
-					}// QR
+					$('#question').html($('#question').html() + '<label id="question-' + result.rows.item(i).id + '"><span>' + result.rows.item(i).question +'</span></label>');
+					var html = '';
+					formatQuestion(result.rows.item(i).id, result.rows.item(i).type);
 				}
-			}
 			}
 
 			,
@@ -215,12 +144,71 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		}
 		);
 
-		function formatQuestion(html) {
-			html = '<label>' + html + '</label>';
-			$('#question').html($('#question').html() + html);
-			$("[name *= 'question-']").bind("change", function(){
-				//alert( "Handler for .change() called." );
-			});
+		function formatQuestion(id, type) {
+			switch(type) {
+				case 1 :// TEXT FIELD
+					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
+					var question = {"id": id};
+					$cordovaSQLite.execute(db, query).then(
+						function (result) {
+							var html = '<input type="text" name="question-' + question.id +
+							'" value="" answer="' + result.rows.item(0).answer + '" placeholder="Введите ответ" required />';
+							$('#question-' + id).html($('#question-' + id).html() + html);
+						},
+						function (err) {
+							error(err)
+						}
+					);
+					break;
+
+				case 2 ://CHECKBOX 
+					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
+					$cordovaSQLite.execute(db, query).then(
+						function (result) {
+							var html = '<input type="checkbox" name="question-' + question.id +
+								'" value="" answer="' + result.rows.item(0).valid + '" required />';
+							$('#question-' + id).html($('#question-' + id).html() + html);
+						},
+						function (err) {
+							error(err)
+						}
+					);
+					break;
+					
+				case 3 :// SELECT
+					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id;
+					$cordovaSQLite.execute(db, query).then(
+						function (result) {
+							var html = '',
+							answer = '';
+							for (var i = 0; i < result.rows.length; i++) {
+								html += '<option>' + result.rows.item(i).answer + '</option>';
+								if (result.rows.item(i).valid == 1)
+									answer = result.rows.item(i).answer;
+							}
+							html = '<select name="question-' + id + '" answer="' + answer + '" required>' + html + '</select>';
+							$('#question-' + id).html($('#question-' + id).html() + html);
+						},
+						function (err) {
+							error(err)
+						}
+					);
+					break;
+					
+				case 4 :// QR
+					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
+					$cordovaSQLite.execute(db, query).then(
+						function (result) {
+							var html = '<button type="button" class="QR">Сканировать QR код</button><input type="text" style="display: none;" id="question-qr" name="question-' + id + '" value="" answer="' + result.rows.item(0).answer + '"/>';
+							$('#question-' + id).html($('#question-' + id).html() + html);
+							$('.QR').bind('click', function(){$('#qr').click()});
+						},
+						function (err) {
+							error(err)
+						}
+					);
+					break;
+			}
 		}
 	}
 
@@ -274,21 +262,17 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 			var id = parseInt($(this).attr('name').replace("question-", ""));
 			
 			if ($(this).is('[type="text"]') || $(this).is('select')) {
-				val = $(this).val();
-				alert ('This val: ' + val + ' and ans: ' + $(this).attr("answer"));
-				if (val != $(this).attr("answer"))
-				{
-					alert('Неверный ответ на вопрос №' + index + 1);
-					ret = false;
-				}
+				val = $(this).val().trim();
 			}
 			else {
 				val = $(this).is(":checked") ? 1 : 0;
-				if (val != parseInt($(this).attr("answer")))
-				{
-					alert('Неверный ответ на вопрос №' + index + 1);
-					ret = false;
-				}
+			}
+			
+			alert ('This val: ' + val + ' and ans: ' + $(this).attr("answer"));
+			if (val.localeCompare($(this).attr("answer").trim()) != 0)
+			{
+				alert('Неверный ответ на вопрос №' + (index + 1));
+				ret = false;
 			}
 		});
 		
@@ -378,6 +362,17 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
 		$('#timer').text(formatTime(hours) + ':' + formatTime(minutes) + ':' + formatTime(seconds));
 	}
+
+	$scope.scanBarcode = function() {
+		$cordovaBarcodeScanner.scan().then(
+			function (imageData) {
+				$('#question-qr').val(imageData.text.trim());
+				$('#next').click();
+				alert(imageData.text.trim());
+			}, function (error) {
+			console.log("An error happened -> " + error);
+		});
+	};
 });
 
 quest.controller('sceneChooseCtrl', function($scope, $state, $cordovaSQLite, SharedProps){
@@ -423,10 +418,11 @@ quest.controller('sceneChooseCtrl', function($scope, $state, $cordovaSQLite, Sha
 				error(err);
 			} 
 		);
+			
 	};
 });
 
-quest.controller('LoginCtrl', function($scope, LoginService, $ionicPlatform, $ionicPopup, $state, USER_ROLES){
+quest.controller('LoginCtrl', function($scope, LoginService, $ionicPlatform, $ionicPopup, $state, $cordovaSQLite, USER_ROLES){
 	$scope.user = {};
 	var defaultForm = {
 		login : "",
@@ -448,7 +444,21 @@ quest.controller('LoginCtrl', function($scope, LoginService, $ionicPlatform, $io
 			});*/
 			if (LoginService.role() == 'user_role'){
 				//alert("Role in ctrl is " + LoginService.role());
-				$state.go('sceneChooser');
+				var inspectQ = "SELECT * from 'active-scene' WHERE 'current_task' > 0";
+				$cordovaSQLite.execute(db, inspectQ).then(
+					function(result){
+						if (result.rows.length > 0){
+							alert("There is unfinished scene, going there..");
+							$state.go('main');
+						} else{
+							alert("No unfinished scenes found, going to chooser");
+							$state.go('sceneChooser');
+						}
+					},function(err){
+						error(err);
+					}
+					
+				);
 			} else {
 				if (LoginService.role() == 'admin_role')
 					$state.go('adminPanel');
@@ -469,22 +479,8 @@ quest.controller('LoginCtrl', function($scope, LoginService, $ionicPlatform, $io
 // 		"', using pswd '" + $scope.user.password);
 });
 
-quest.controller("qrCodeCtrl", function ($scope, $cordovaBarcodeScanner) {
-	$scope.scanBarcode = function () {
-		$cordovaBarcodeScanner.scan().then(function (imageData) {
-			var respond = imageData.text;
-			if (respond == "Правильный ответ")
-				alert("Bingo!");
-			console.log("Barcode Format -> " + imageData.format);
-			console.log("Cancelled -> " + imageData.cancelled);
-		}, function (error) {
-			console.log("An error happened -> " + error);
-		});
-	};
-});
-
 quest.controller("AdminCtrl", function ($rootScope, $scope, $state, $ionicPlatform, $ionicModal, $cordovaSQLite, $ionicListDelegate, SharedProps) {
-// 	button to set DB to default value
+	//button to set DB to default value
 	$scope.prefildDB = function(){
 		if (confirm("Очистить ДБ?")){
 			prefildDB();
@@ -685,10 +681,10 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 // 					alert("selected scene'd have " + result.rows.length + " tasks");
 					for (var i = 0; i < result.rows.length; i++){
 						$scope.pages.push({
-							id: result.rows.item(i).id,
-							scene: result.rows.item(i).scene,
-							num: result.rows.item(i).num,
-							task: result.rows.item(i).task
+							id: 		result.rows.item(i).id,
+							scene: 	result.rows.item(i).scene,
+							num: 		result.rows.item(i).num,
+							task: 	result.rows.item(i).task
 						});
 						var taskQuery = 'SELECT * FROM  `tasks` WHERE id = ' + result.rows.item(i).id;
 					}
@@ -699,6 +695,8 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 				});
 // 			$state.go('sceneEditor');
 	};
+	
+	
 	
 	$scope.deletePage = function(page){
 // 		alert("Trying to delete page #" + page.num);
@@ -754,29 +752,33 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 	
 });
 
-quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionicModal, SharedProps){
+quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionicModal, $ionicListDelegate, SharedProps){
 // 	$scope.page = SharedProps.getCurrPage();
 	$scope.task = {
-		id: '',
-		title: '',
-		content: '',
-		img: ''
+		id: 		'',
+		title: 	'',
+		content: 	'',
+		img: 		''
 	};
 	
-	$ionicModal.fromTemplateUrl('templates/addNewPage.html', function($ionicModal){
-		$scope.newPage = $ionicModal;
+	$scope.questions = [];
+	
+	$ionicModal.fromTemplateUrl('templates/addNewQuestion.html', function($ionicModal){
+		$scope.newQuestion = $ionicModal;
 	},{
 		scope: $scope,
 		animation: 'slide-in-up'
 	});
 	
-	$scope.addNewPage = function(){
-		$scope.newPage.show();
-		$scope.task = {
-			id: "",
-			title: "",
-			content: "",
-			img: ""
+	$scope.addNewQuestion = function(){
+		$scope.newQuestion.show();
+		$scope.question = {
+			id: 		'',
+			task: 	'',
+			number: 	'',
+			type: 	'',
+			question: 	'',
+			answer: 	''
 		}
 	};
 	
@@ -799,28 +801,162 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionic
 					$scope.task.content = result.rows.item(0).content;
 					$scope.task.img = result.rows.item(0).img;
 				} else {alert("Page #" + page.id + " has no tasks on it.");}
-			
-				alert("query task title: " + result.rows.item(0).title + "\n variable task title: " + $scope.task.title);
-					alert($scope.task.id + " " + $scope.task.title + " " + $scope.task.content);
 			}, function (err) {
 				error(err);
 			}
 		);
+	}
+	
+	$ionicModal.fromTemplateUrl('templates/questionEditor.html', function($ionicModal){
+		$scope.newQuestion = $ionicModal;
+	},{
+		scope: $scope,
+		animation: 'slide-in-up'
+	});
+	
+	$scope.addNewQuestion = function(){
+		$scope.newQuestion.show();
+		$scope.question = {
+			id: 		"",
+			task: 	"",
+			number: 	"",
+			type: 	"",
+			question: 	""
+		}
 	};
 	
-	/*$scope.deletePage = function(task){
-		alert("Trying to delete task #" + task.num);
+	$scope.closeCreating = function(){
+	  $scope.newScene.hide();
+	}
+	
+	$scope.confirmSceneCreate = function(scene){
+		var addQuery = 'INSERT INTO `scene` ("name", "time") VALUES ("' + scene.name + '", ' + scene.time +')';
+		alert(addQuery);
+		$cordovaSQLite.execute(db, addQuery).then(
+			function(){
+				$scope.$emit('sceneAdded');
+				$state.go('adminPanel');
+				$scope.newScene.hide();
+			},
+                function (err) {
+                  error(err)
+			  //  alert("Smth went wrong..");
+                }
+		);
 	};
-	$scope.editPage = function(task){
-		alert("Trying to edit task #" + task.num);
-		SharedProps.setCurrTask(task);
-		alert("Task of id " + SharedProps.getCurrTask.id + " is set to curr");
+	
+	$scope.openQuestion = function(){
+		var questionQuery = 'SELECT * FROM "questions" WHERE "task" = ' + $scope.task.id;
+		$cordovaSQLite.execute(db, questionQuery).then(
+			function(result){
+				if (result.rows.length > 0){
+					for (var i = 0; i = result.rows.length; i++){
+						$scope.questions.push({
+							id: 		result.rows.item(i).id,
+							task: 	result.rows.item(i).task,
+							number: 	result.rows.item(i).number,
+							type: 	result.rows.item(i).type,
+							question: 	result.rows.item(i).question
+						});
+					}
+				}
+			}, function(err){
+				error(err);
+			}
+		);
+	}
+	
+	
+	$scope.confirmQuestionCreate = function(){
+		var query = 'SELECT * from `questions` WHERE "task" = ' + $scope.task.id;
+		$cordovaSQLite.execute(db, query).then(
+			function(result){
+				var maxNum = -1;
+				for (var i = 0; i < $scope.questions.length; i++){
+					if ($scope.questions[i].number > maxNum)
+						maxNum = $scope.questions[i].number;
+				}
+				var length = result.rows.length;
+// 				alert(length + " pages found");
+				if (length == 0){
+					var maxNum = 0;
+				}
+				var addNewQuestionQuery = 'INSERT INTO `questions` ("task", "number") VALUES (' + $scope.task.id + ', ' + (maxNum+1) +')';
+// 					alert(addNewPageQuery);
+				$cordovaSQLite.execute(db, addNewQuestion).then(
+					function(){
+						$scope.$emit('questionAdded');
+						$state.go('pageEditor');
+					}, function(err){
+						error(err);
+					}
+				);					
+			
+			}, function(err){
+				error(err);
+			}
+		);
+	}
+	
+	$scope.editQuestion = function(question){
+		SharedProps.setCurrQuestion(question);
+		$ionicListDelegate.closeOptionButtons();
+		$scope.question = {
+			id: 		question.id,
+			task: 	question.task,
+			number: 	question.number,
+			type: 	question.type,
+			question: 	question.question,
+			answer: 	question.answer
+		}
+		$scope.newQuestion.show();
 	};
-	$scope.moveTask = function(task, fromIndex, toIndex) {
-		//alert($scope.scenes.join('\n'));
-		$scope.tasks.splice(fromIndex, 1);
-		$scope.tasks.splice(toIndex, 0, task);
-	};*/
+	
+	$scope.deleteQuestion = function(question){
+// 		alert("Trying to delete page #" + page.num);
+		if(confirm("Вы действительно хотите удалить вопрос " + question.number)){
+			var deleteQuestionQuery = 'DELETE from `questions` WHERE "task" = ' + question.task + ' AND "number" = ' + page.number;
+			$cordovaSQLite.execute(db, deleteQuestionQuery).then(
+				function(){
+					$scope.questions.splice($scope.questions.indexOf(page), 1);
+					var updateQuestionsNumbers = 'UPDATE `questions` SET "number" = number - 1 WHERE "number" >' + question.number;
+					$cordovaSQLite.execute(db, updateQuestionssNumbers).then(
+						function(){
+							$scope.$emit('questionAdded');
+						}, function(err){
+							error(err);
+						}
+					);
+				}, function(err){
+					error(err);
+				}
+			);
+		}
+	};
+	
+	$scope.moveQuestions = function(task, fromIndex, toIndex) {
+		var updateFirst = 'UPDATE `questions` SET "number" = ' + $scope.questions[toIndex].number + ' WHERE "id" = ' + $scope.questions[fromIndex].id;
+		var updateSecond = 'UPDATE `questions` SET "number" = ' + $scope.questions[fromIndex].number + ' WHERE "id" = ' + $scope.questions[toIndex].id;
+		$cordovaSQLite.execute(db, updateFirst).then(
+			function(){
+				$cordovaSQLite.execute(db, updateSecond).then(
+					function(){
+						$scope.questions.splice(fromIndex, 1);
+						$scope.questions.splice(toIndex, 0, page);
+					},
+					function(err){error(err);}
+				);
+			},function(err){
+				error(err);
+			}
+		);
+		alert(updateFirst + '\n *** \n' + updateSecond);
+	};
+	
+	$scope.$on('questionAdded', function(){
+		$scope.questions = [];
+		$scope.openPage();
+	});
 });
 	
 function formatTime(time) {

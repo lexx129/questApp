@@ -9,6 +9,13 @@
         <dex dex="/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/pre-dexed/debug/CordovaLib-unspecified-debug_6747d24228e7165f35fca9ce9d6c07bfc9f39d5b.jar" />
     </item>
     <item
+        jar="/home/lexx/ionicApps/someSQLapp/platforms/android/libs/com.google.zxing.client.android.captureactivity.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="daca75b7de34e1ca229682f2cd54b54e1c324be6">
+        <dex dex="/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/pre-dexed/debug/com.google.zxing.client.android.captureactivity_c04f1a49cc7fcddc4f863c3f7e13774a7d6bd5a0.jar" />
+    </item>
+    <item
         jar="/home/lexx/ionicApps/someSQLapp/platforms/android/libs/sqlite-connector.jar"
         jumboMode="false"
         revision="23.0.3"

@@ -1,19 +1,14 @@
 <ion-view hide-nav-bar="true" ng-init=getContext()>
-<ion-pane>
-  <ion-header-bar class="bar-positive">
-    <div id="timer">00:00</div>
-    <h2 class="title">Quest</h2>
-  </ion-header-bar>
-  <ion-content class="padding login">
-    <div class="text">
-      <h1></h1>
-      <div id="content"></div>
-      <div id="question"></div>
-    </div>
-    <br/>
-    <br/>
-    <br/>
-    <button class="button icon center" ng-click="getnextpage()">Далее</button>
-  </ion-content>
-</ion-pane>
+	<ion-pane id="main">
+		<div id="timer">00:00</div>
+		<ion-content class="padding login">
+			<div class="text">
+				<h1></h1>
+				<div id="content"></div>
+				<div id="question"></div>
+			</div>
+			<button id="qr" type="hidden" class="button icon center"  ng-click="scanBarcode()">QR</button>
+			<button id="next" class="button icon center" ng-click="getnextpage()">Далее</button>
+		</ion-content>
+	</ion-pane>
 </ion-view>

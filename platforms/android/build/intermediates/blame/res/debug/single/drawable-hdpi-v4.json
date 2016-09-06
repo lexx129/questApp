@@ -1,6 +1,14 @@
 [
     {
+        "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/drawable-hdpi-v4/shopper_icon.png",
+        "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/drawable-hdpi/shopper_icon.png"
+    },
+    {
         "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/drawable-hdpi-v4/icon.png",
         "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/drawable-hdpi/icon.png"
+    },
+    {
+        "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/drawable-hdpi-v4/launcher_icon.png",
+        "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/drawable-hdpi/launcher_icon.png"
     }
 ]

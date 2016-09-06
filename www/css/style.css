@@ -1,20 +1,58 @@
+html, body {
+	font-size: 24px;
+}
+
+/* UNIVERSAL */
+
 .center {
   margin-left: auto;
   margin-right: auto;
   display: block;
 }
+
 .text {
     text-align:  center;
-   }
+}
+
 .right {
-  margin-left: auto;
-  display: block;
+	margin-left: auto;
+	display: block;
 }
 
-.login {
-  background: url('/img/texture.jpg') no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
+/* PAGE STYLES */
+
+#main {
+	background: url('../img/texture.jpg') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
 }
 
+	#content {
+
+	}
+
+	#question {
+		text-align: center;
+	}
+
+		#question label {
+			display: block;
+			padding: 1.3rem;
+		}
+		
+			#question label span {
+				display: block;
+			}
+	
+			#question label input,
+			#question label select {
+				display: inline-block;
+				border: none;
+				background: none;
+				border-bottom: 3px solid #000;
+			}
+			
+			#question-qr, #qr {
+				display: none;
+			}

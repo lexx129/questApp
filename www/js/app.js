@@ -30,52 +30,58 @@ quest.run(function($ionicPlatform,  $cordovaSQLite) {
 })
 
 quest.constant('USER_ROLES', {
-	admin: 'admin_role',
-	user: 'user_role'
+	admin: 	'admin_role',
+	user: 	'user_role'
 });
 
 quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 	$stateProvider
 // just some login form
 	.state('login', {
-		url: '/login',
-		templateUrl: 'templates/login.html',
-		controller: 'LoginCtrl'
+		url: 			'/login',
+		templateUrl:	'templates/login.html',
+		controller: 	'LoginCtrl'
 	})
 	
 // 	From for initial scene choosing
 	.state('sceneChooser',{
-		url: '/sceneChooser',
-		templateUrl: 'templates/sceneChooser.html',
-		controller: 'sceneChooseCtrl'
+		url: 			'/sceneChooser',
+		templateUrl: 	'templates/sceneChooser.html',
+		controller: 	'sceneChooseCtrl'
 	})
 	
 // 	Form for quest-playing
 	.state('main', {
-		url: '/quest',
-		templateUrl: 'templates/main.html',
-		controller: 'QuestCtrl'
+		url: 			'/quest',
+		templateUrl: 	'templates/main.html',
+		controller: 	'QuestCtrl'
 	})
 	
 // 	Just an admin panel :)
 	.state('adminPanel', {
-		url: '/adminPanel',
+		url: 			'/adminPanel',
 // 		views: {
 // 			'adminPanel@': {
-		templateUrl: 'templates/adminPanel.html',
-		controller: 'AdminCtrl'
+		templateUrl: 	'templates/adminPanel.html',
+		controller: 	'AdminCtrl'
  	})
 	
 	.state('sceneEditor', {
-		url: '/sceneEditor',
-		templateUrl: 'templates/sceneEditor.html',
-		controller: 'sceneEditCtrl'
+		url: 			'/sceneEditor',
+		templateUrl: 	'templates/sceneEditor.html',
+		controller: 	'sceneEditCtrl'
 	})
 	
 	.state('pageEditor', {
-		url: '/pageEditor',
-		templateUrl: 'templates/pageEditor.html',
-		controller: 'pageEditCtrl'
+		url: 			'/pageEditor',
+		templateUrl: 	'templates/pageEditor.html',
+		controller: 	'pageEditCtrl'
+	})
+	
+	.state('questionEditor', {
+		url: 			'/questionEditor',
+		templateUrl: 	'templates/questionEditor.html',
+		controller: 	'pageEditCtrl'
 	})
 // 		}
 	

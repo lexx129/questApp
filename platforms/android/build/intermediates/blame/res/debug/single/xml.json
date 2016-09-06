@@ -2,5 +2,9 @@
     {
         "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/xml/config.xml",
         "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/xml/config.xml"
+    },
+    {
+        "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/xml/preferences.xml",
+        "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/xml/preferences.xml"
     }
 ]

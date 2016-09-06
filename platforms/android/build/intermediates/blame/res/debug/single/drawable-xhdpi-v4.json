@@ -1,5 +1,9 @@
 [
     {
+        "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/drawable-xhdpi-v4/launcher_icon.png",
+        "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/drawable-xhdpi/launcher_icon.png"
+    },
+    {
         "merged": "/home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/res/merged/debug/drawable-xhdpi-v4/icon.png",
         "source": "/home/lexx/ionicApps/someSQLapp/platforms/android/res/drawable-xhdpi/icon.png"
     }
