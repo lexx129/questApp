@@ -1,0 +1,26 @@
+<div class="modal">
+	<ion-header-bar class="bar-secondary">
+		<h1 class="title">Создание нового сценария</h1>
+		<button class="button button-stable" ng-click="closeCreating()">Отмена</button>
+	</ion-header-bar>
+	<ion-content>
+		<form ng-submit="confirmSceneCreate(scene)">
+			<div class="list">
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">Имя сценария</span>
+					<input type="text" placeholder="Новый сценарий"
+				ng-model="scene.name">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">Время (мин.)</span>
+					<input type="text" placeholder=15
+					ng-model="scene.time">
+				</label>
+			</div>
+			<div class="padding">
+				<button type="submit" class="button button-block button-positive" >Добавить</button>
+			</div>
+			
+		</form>
+	</ion-content>
+</div>

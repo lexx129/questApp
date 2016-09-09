@@ -1,0 +1,53 @@
+<ion-header-bar class="bar-positive">
+	<div class="buttons">
+			<ion-header-back-button>
+			</ion-header-back-button>
+			<button class="button button-icon icon ion-ios-minus-outline"
+          ng-click="data.showDelete = !data.showDelete; data.showReorder = false"></button>
+		</div>
+			<h1 class="title">{{scene.name}}</h1>
+		<div class="buttons">
+			<button class="button button-stable"
+			ng-click="data.showDelete = false; data.showReorder = !data.showReorder">Переместить</button>
+		</div>
+</ion-header-bar>
+<ion-view view-title="Scene Editor" name="SceneEdit" ng-init=openScene()>
+  <ion-content class="padding">
+ 	<div>
+		<!--<p1>Открыт сценарий: <strong>{{scene.name}}</strong></p1>
+		<br>
+		
+		Список страниц:</p1>-->
+		<h3>Общая информация: </h3>
+		<div class="list">
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Имя сценария</span>
+				<input type="text" placeholder={{scene.name}}
+				ng-model="scene.name">
+			</label>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Отведенное время (мин.)</span>
+				<input type="number" placeholder={{scene.time}} 
+				ng-model="scene.time">
+			</label>
+		</div>
+		<h2 ng-show="pages.length == 0" align="center">У этого сценария пока нет страниц!</h2>
+		<h3 ng-show="pages.length != 0">Список страниц: </h3>
+		<ion-list show-delete="data.showDelete" show-reorder="data.showReorder">
+			<ion-item ng-repeat="page in pages">
+				<ion-delete-button class="ion-minus-circled" ng-click="deletePage(page)"></ion-delete-button>
+				<ion-option-button class="button-assertive" ng-click="editPage(page)">Изменить</ion-option-button>
+				<ion-reorder-button class="ion-navicon" on-reorder="movePage(page, $fromIndex, $toIndex)"></ion-reorder-button>
+				<span class="title">{{"Страница " + page.num}}</span>
+			</ion-item>
+		</ion-list>
+		
+      </div>
+  </ion-content>
+  <ion-footer-bar align-title="center" class="bar-balanced">
+	<div class="buttons">
+	<!--**This button needs to be centered in the footer**-->
+		<button class="button button-stable icon icon-left ion-plus" ng-click="addNewPage()">Создать страницу</button>
+	</div>
+  </ion-footer-bar>
+</ion-view>

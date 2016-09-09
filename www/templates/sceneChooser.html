@@ -1,0 +1,18 @@
+ <ion-view view-title="sceneChooser" name="choose" ng-init="printScenes()">
+  <ion-content class="padding">
+<!-- 	<div ng-controller="AdminCtrl"> -->
+      <div>
+		<p1>Список существующих сценариев:</p1>
+		
+		<ion-list>
+			<ion-item ng-repeat="scene in scenes">
+				<span class="title" ng-click=setScene(scene)>{{"[" + scene.id +"]" + scene.name}}</span>
+			</ion-item>
+		</ion-list>
+		
+      </div>
+      
+<!-- 	</div> -->
+  </ion-content>
+  
+</ion-view>

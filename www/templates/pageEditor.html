@@ -1,0 +1,57 @@
+<ion-header-bar class="bar-positive">
+	<div class="buttons">
+			<ion-header-back-button>
+			</ion-header-back-button>
+			<button class="button button-icon icon ion-ios-minus-outline"
+          ng-click="data.showDelete = !data.showDelete; data.showReorder = false"></button>
+	</div>
+	<h1 class="title">Страница {{page.num}}</h1>
+	<div class="buttons">
+		<button class="button button-stable"
+		ng-click="data.showDelete = false; data.showReorder = !data.showReorder">Переместить</button>
+	</div>
+</ion-header-bar>
+<ion-view view-title="Page Editor" name="PageEdit" ng-init=openPage()>
+	<ion-content class="padding">
+		<div>
+			<h3>Содержимое страницы: </h3>
+			<!--<br>
+			
+			Список страниц:</p1>-->
+			<div class="list">
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">Заголовок:</span>
+					<input type="text" placeholder={{task.title}}
+					ng-model="$scope.task.title">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">Содержимое:</span>
+					<input type="text" placeholder={{task.content}} 
+					ng-model="$scope.task.content">
+				</label>
+				<div>
+				
+				<h3>Список вопросов: </h3>
+					<div class="list">
+						<ion-list show-delete="data.showDelete" show-reorder="data.showReorder">
+						<ion-item ng-repeat="question in questions">
+							<ion-delete-button class="ion-minus-circled" ng-click="deleteQuestion(question)"></ion-delete-button>
+							<ion-option-button class="button-assertive" ng-click="editQuestion(question)">Изменить</ion-option-button>
+							<ion-reorder-button class="ion-navicon" on-reorder="moveQuestion(question, $fromIndex, $toIndex)"></ion-reorder-button>
+							<span class="title">{{"Вопрос " + question.number}}</span>
+						</ion-item>
+						</ion-list>
+					</div>
+				</div>	
+				
+			
+			</div>
+		</div>
+	</ion-content>
+	<ion-footer-bar align-title="center" class="bar-balanced">
+		<div class="buttons">
+		<!--**This button needs to be centered in the footer**-->
+			<button class="button button-stable icon icon-left ion-plus" ng-click="addNewQuestion()">Добавить вопрос</button>
+		</div>
+	</ion-footer-bar>
+  </ion-view>
