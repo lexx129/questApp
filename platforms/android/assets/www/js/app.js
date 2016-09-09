@@ -81,9 +81,9 @@ quest.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 	.state('questionEditor', {
 		url: 			'/questionEditor',
 		templateUrl: 	'templates/questionEditor.html',
-		controller: 	'pageEditCtrl'
+		controller: 	'questionEditCtrl'
 	})
-// 		}
+
 	
 	
 
