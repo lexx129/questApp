@@ -23,8 +23,12 @@
 					<option ng-show="question.type != 4">4 (QR-код)</option>
 				</select>
 			</label>-->
-			<div class="input-label">
-				Тип вопроса: {{type.id}} -- {{type.desc}}
+			<div class="item item-stacked-label">
+				<ion-list>
+					<ion-item ng-repeat="type in types">
+						<span>Тип вопроса: {{type.id}} -- {{type.desc}}</span>
+					</ion-item>
+				</ion-list>
 			</div>
 			<select ng-model="question.type" ng-options="type.id for type in types" ng-change="onTypeChange(question)">
 				<!--<option ng-repeat="type in types" value="type.id">{{type.id + ' (' + type.desc + ')'}}</option>-->

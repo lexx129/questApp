@@ -11,12 +11,25 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		name: 	'',
 		task: 	''
 	};
+	
+	$scope.$on('$ionicView.enter', function(){
+	
+		$scope.getContext();
+	});
+	
+	var deregister = $ionicPlatform.registerBackButtonAction(
+		function(e){
+			e.preventDefault();
+		}, 101
+	);
+	
+	$scope.$on('$destroy', deregister);
 
 	$scope.getContext = function() {
 		var query = "SELECT * FROM `active-scene`";
 		var promise = $cordovaSQLite.execute(db, query).then(
 			function (result) {
-				if (result.rows.length != 1) {
+				if (result.rows.length > 1) {
 					alert("there're more then 1 active scene now");
 					$state.go('sceneChooser');
 					return;
@@ -24,12 +37,15 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 				$scope.scene.startTime = result.rows.item(0).start_time;
 				$scope.scene.id = result.rows.item(0).scene;
 				$scope.scene.currentTask = result.rows.item(0).current_task;
-				
-				alert("\nactive scene id is " + $scope.scene.id);
 
 				if ($scope.scene.currentTask != 0 && !confirm("Продолжить квест?"))
+				{
+// 					$scope.scene.currentTask = 0;
+					
 					$state.go('sceneChooser');
-				
+					return;
+				}
+				alert("1");
 				var query = 'SELECT * FROM `scene` WHERE `id` ="' + $scope.scene.id + '"';
 // 				alert("query 1 = " + query);
 				$cordovaSQLite.execute(db, query).then(
@@ -43,7 +59,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 						$scope.scene.time = result.rows.item(0).time;
 						
 						alert("scene name = " + $scope.scene.name + "\n scene time = " + $scope.scene.time);
-						document.getElementById("timer").innerHTML = formatTime(parseInt($scope.scene.time / 60)) + ':' + formatTime(parseInt($scope.scene.time % 60)) + ':00';
+						document.getElementById("timer").innerHTML = formatTime($scope.scene.time) + ':00';
 
 						var query = 'SELECT * FROM `scene-list` WHERE scene = "' + $scope.scene.id + '" AND `num` = "' + $scope.scene.currentTask + '"';
 // 						alert("query 2 = " + query);
@@ -74,27 +90,36 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		alert('currentTask ' + $scope.scene.currentTask + '  scene.id ' + $scope.scene.id);
 
 		if ($scope.scene.currentTask == -1) {
-			var msg = '';
+			var msg = '', txt = '';
+
+			var totalTime = Date.parse(new Date()) - Date.parse($scope.scene.startTime) - UTCShift * 1000 - 5000;
+			
 			switch (status) {
 				case 'overtime' :
-				msg = 'Время вышло';
+				txt = "Время вышло!";
+				msg = '<h1 class="lose">' + txt + '</h1>';
+				$('#timer-container').addClass('red');
 				break;
 				default:
-				msg = 'Конец';
+				txt = "Победа!";
+				msg = '<h1 class="win">Вы выйграли</h1><h3>Ваше время <div>' + formatTime(Math.floor((totalTime / 1000) / 60)) + ':' + formatTime(Math.floor((totalTime / 1000) % 60)) + '</div></h3>';
 			}
+			
 			timerStart = false;
 			clearInterval(timeinterval);
 
-			var totalTime = Date.parse(new Date()) - Date.parse($scope.scene.startTime);
 
-			var query = 'INSERT INTO `scene-stats` ("scene", "time", "status") VALUES (' + $scope.scene.id + ', ' + totalTime + ', "' + msg + '")';
+			var query = 'INSERT INTO `scene-stats` ("scene", "time", "status") VALUES (' + $scope.scene.id + ', ' + totalTime + ', "' + txt + '")';
 
 			$cordovaSQLite.execute(db, query).then(
 				function () {
 				var query = 'DELETE FROM `active-scene`';
 				$cordovaSQLite.execute(db, query).then($cordovaSQLite.execute(db, 'VACUUM'));
-
-				$('ion-content').html('<h1>' + msg + '</h1>');
+					$('#timer').text("00:00");
+					$('header').css('display','table-row');	
+					$('#content').html(msg);	
+					$('#question').html('');
+					$('footer').html('<div><div class="empty"></div></div>');
 				},
 				function (err) {
 				error(err)
@@ -104,7 +129,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		}
 
 		if ($scope.scene.currentTask == 0) {
-			$('h1').text($scope.scene.name);
+			$('#content').html('<h1>' + $scope.scene.name + '</h1>');
 			return;
 		}
 
@@ -116,12 +141,18 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		$cordovaSQLite.execute(db, query).then(
 		function (result) {
 			if (result.rows.length == 0) {
-				error('!exists task ' + $scope.scene.task);
+				$scope.scene.currentTask = -1;
+				getPage();
 				return;
 			}
-			$('h1').text(result.rows.item(0).title);
 
-			$('#content').text(result.rows.item(0).content);
+			$('#content').html(
+				'<h4>Задание ' + $scope.scene.currentTask + '</h4>' +
+				'<h2>' + result.rows.item(0).title + '</h2>' +
+				'<p>' + result.rows.item(0).content + '</p>'
+			);
+			$('header').css('display','none');
+			
 			var query = 'SELECT * FROM `questions` WHERE `task` = ' + $scope.scene.task + ' ORDER BY `number`';
 			$cordovaSQLite.execute(db, query).then(
 			function (result) {
@@ -163,6 +194,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 
 				case 2 ://CHECKBOX 
 					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
+					var question = {"id": id};
 					$cordovaSQLite.execute(db, query).then(
 						function (result) {
 							var html = '<input type="checkbox" name="question-' + question.id +
@@ -199,7 +231,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
 					$cordovaSQLite.execute(db, query).then(
 						function (result) {
-							var html = '<button type="button" class="QR">Сканировать QR код</button><input type="text" id="question-qr" name="question-' + id + '" value="" answer="' + result.rows.item(0).answer + '"/>';
+							var html = '<button type="button" class="QR">Сканировать QR код</button><input type="text" id="question-qr" name="question-' + id + '" value="" answer="' + result.rows.item(0).answer + '" style="display: none;"/>';
 							$('#question-' + id).html($('#question-' + id).html() + html);
 							$('.QR').bind('click', function(){$('#qr').click()});
 						},
@@ -256,8 +288,8 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		if (!$( "[name *= 'question-']" ).length)
 			return -1;
 		
+		$( ".red" ).removeClass('red');
 		$( "[name *= 'question-']" ).each(function( index ) {
-			alert(index);
 			var val = '';
 			var id = parseInt($(this).attr('name').replace("question-", ""));
 			
@@ -268,10 +300,14 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 				val = $(this).is(":checked") ? 1 : 0;
 			}
 			
-			alert ('This val: ' + val + ' and ans: ' + $(this).attr("answer"));
+			//alert ('This val: ' + val + ' and ans: ' + $(this).attr("answer"));
 			if (val.localeCompare($(this).attr("answer").trim()) != 0)
 			{
-				alert('Неверный ответ на вопрос №' + (index + 1));
+				//alert('Неверный ответ на вопрос №' + (index + 1));
+				if ($(this).attr('id') == 'question-qr') {
+					$('.QR').addClass('red');
+				}
+				$(this).addClass('red');
 				ret = false;
 			}
 		});
@@ -353,14 +389,14 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 			return;
 		
 		if (t < 0) {
+			alert(t);
 			$scope.scene.currentTask = -1;
 			getPage('overtime');
 			return;
 		}
 		var seconds = Math.floor((t / 1000) % 60);
-		var minutes = Math.floor((t / 1000 / 60) % 60);
-		var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-		$('#timer').text(formatTime(hours) + ':' + formatTime(minutes) + ':' + formatTime(seconds));
+		var minutes = Math.floor(t / 1000 / 60);
+		$('#timer').text(formatTime(minutes) + ':' + formatTime(seconds));
 	}
 
 	$scope.scanBarcode = function() {
@@ -402,6 +438,7 @@ quest.controller('sceneChooseCtrl', function($scope, $state, $cordovaSQLite, Sha
 	};	
 	
 	$scope.setScene = function(scene){
+// 		$scope.scene = scene;
 		var clearQ = "DELETE from 'active-scene'";
 		$cordovaSQLite.execute(db, clearQ).then(
 			function(){
@@ -761,8 +798,6 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionic
 		img: 		''
 	};
 	
-	
-	
 	$scope.questions = [];
 	$scope.answers = [];
 	
@@ -825,7 +860,7 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionic
 						maxNum = $scope.questions[i].number;
 				}
 				var length = result.rows.length;
-// 				alert(length + " pages found");
+				alert(length + " questions found");
 				if (length == 0){
 					var maxNum = 0;
 				}
@@ -896,6 +931,34 @@ quest.controller("pageEditCtrl", function($scope, $state, $cordovaSQLite, $ionic
 	$scope.$on('questionAdded', function(){
 		$scope.questions = [];
 		$scope.openPage();
+	});
+	
+	$scope.$on('$ionicView.unloaded', function(){
+		var checkQuery = 'SELECT * FROM `tasks` WHERE "id" = ' + $scope.task.id;
+		$cordovaSQLite.execute(db, checkQuery).then(
+			function(result){
+				var currTitle = result.rows.item(0).title;
+				var currContent = result.rows.item(0).content;
+				var img = result.rows.item(0).img;
+				var updateTaskInfoQuery = 'UPDATE `tasks` SET "title" = "' + $scope.task.title + '", "content" = "' + $scope.task.content + '" WHERE "id" = ' + $scope.scene.id;
+				if (currName != $scope.scene.name || currTime != $scope.scene.time){
+// 					alert("updating current scene... \n query: " + updateSceneInfoQuery);
+					$cordovaSQLite.execute(db, updateSceneInfoQuery).then(
+						function() {
+							alert("scene info updated");
+							$rootScope.$emit('sceneAdded');
+						},
+						function(err){
+							error(err);
+						}		
+					);
+				} /*else {
+					alert("No need to refresh sceneList");
+				}*/
+			}
+		);
+		
+		
 	});
 });
 

@@ -9,7 +9,7 @@ var db = null,
 
 var quest = angular.module('quest', ['ionic', 'ngCordova']);
 
-quest.run(function($ionicPlatform,  $cordovaSQLite) {
+quest.run(function($ionicPlatform,  $cordovaSQLite, $state) {
   $ionicPlatform.ready(function() {
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -18,6 +18,22 @@ quest.run(function($ionicPlatform,  $cordovaSQLite) {
     if (window.StatusBar) {
       StatusBar.styleDefault();
     }
+    
+ /*   $ionicPlatform.registerBackButtonAction(function(event){
+		if($state.current.name == "main"){
+			$ionicPopup.confirm({
+				title: 'Предупреждение',
+				template: 'Вы действительно хотите выйти?'
+			}).then(function(res){
+				if (res){
+					$ionicPlatform.exitApp();
+				}
+			})
+		}
+	    
+	}, 100);*/
+    
+	
     sqlplugin = $cordovaSQLite;
     db = $cordovaSQLite.openDB({name: "quest.db", location: "default"});
     //getContext();
