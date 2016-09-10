@@ -30,8 +30,8 @@
 					ng-model="task.content">
 				</label>
 				<div>
-				
-				<h3>Список вопросов: </h3>
+				<h3 ng-show="questions.length == 0" align="center">На этой странице пока нет вопросов!</h3>
+				<h3 ng-show="questions.length != 0">Список вопросов: </h3>
 					<div class="list">
 						<ion-list show-delete="data.showDelete" show-reorder="data.showReorder">
 						<ion-item ng-repeat="question in questions">
