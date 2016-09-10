@@ -1,0 +1,41 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<title>QUEST</title>
+
+	<link href="lib/ionic/css/ionic.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+	<ion-view hide-nav-bar="true" ng-init=getContext()>
+		<ion-pane>
+			<div id="main">
+				<div id="timer-container">
+					<div class="box">
+						<div id="timer">45:00</div>
+					</div>
+				</div>
+				<ion-content class="padding login">
+					<div class="content-table">
+						<header>
+							<div>
+								<div class="empty"></div>
+							</div>
+						</header>
+						<div class="text" id="content">
+							<h1 class="big sart">Какое-то название квеста</h1>
+						</div>
+						<footer>
+							<div>
+								<button id="qr" type="hidden" class="button icon center"  ng-click="scanBarcode()">QR</button>
+								<button id="next" class="center" ng-click="getnextpage()">Начать квест</button>
+							</div>
+						</footer>
+					</div>
+				</ion-content>
+			</div>
+		</ion-pane>
+	</ion-view>
+</body>
+</html>

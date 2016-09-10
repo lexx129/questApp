@@ -1,0 +1,205 @@
+@font-face {
+	font-family: BemountLine;
+	src:	local(BemountLine),
+			url(../font/BemountLine.eot?),
+			url(../font/BemountLine.otf) format("opentype");
+}
+
+@font-face {
+	font-family: Bemount;
+	src:	local(Bemount),
+			url(../font/Bemount.eot?),
+			url(../font/Bemount.otf) format("opentype");
+}
+
+html, body {
+	font-size: 24px;
+}
+
+/* UNIVERSAL */
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+::-webkit-input-placeholder			{opacity: 1; color: #000;}
+::-moz-placeholder					{opacity: 1; color: #000;}
+:-moz-placeholder					{opacity: 1; color: #000;}
+:-ms-input-placeholder				{opacity: 1; color: #000;}
+
+/**/
+.text {
+    text-align:  center;
+}
+
+.right {
+	margin-left: auto;
+	display: block;
+}
+
+/* PAGE STYLES */
+
+#main {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	color: #000;
+	font-size: 20px;
+	font-weight: 100;
+	font-family: Bemount, BemountLine, sans-serif;
+	text-align: center;
+	background: #ddbd88 url('../img/bg.jpg') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+	height: 100vh;
+}
+
+	#timer-container {
+		position: absolute;
+		display: table;
+		top: 2%;
+		left: 2%;
+		width: 90px;
+		height: 90px;
+		background: url(../img/watch.png) no-repeat center center /contain;
+	}
+
+	#timer-container.red {
+		background-image: url(../img/red-watch.png);
+	}
+
+		#timer-container .box {
+			display: table-cell;
+			vertical-align: middle;
+			padding-top: 12px;
+		}
+
+			#timer {
+				font-size: 1.3rem;
+			}
+
+	#main .text {
+		font-size: 1rem;
+		width: 75%;
+		margin: 0 auto;
+	}
+
+		#main .text h1 {
+			font-size: 3.5rem;
+			line-height: 3rem;
+			font-family: BemountLine, Bemount, sans-serif;
+		}
+
+		#main .text h1.win {
+			color: #02a846;
+			font-family: Bemount, 
+		}
+
+		#main .text h1.lose {
+			color: #d01a19;
+			font-family: Bemount, 
+		}
+
+		#main .text h2 {
+			font-family: Bemount, BemountLine, sans-serif;
+			font-size: 1.3rem;
+		}
+
+		#main .text h3 {
+			font-family: Bemount, BemountLine, sans-serif;
+			font-size: 1.85rem;
+		}
+
+			#main .text h3 div {
+				font-size: 3.5rem;
+				font-family: BemountLine, Bemount, sans-serif;
+			}
+
+		#main .text h4 {
+			font-family: Bemount, BemountLine, sans-serif;
+			font-size: 1.1rem;
+		}
+
+		#main .text p {
+			text-align: left;
+			-moz-hyphens: auto;
+			-webkit-hyphens: auto;
+			-ms-hyphens: auto;
+			hyphens: auto;
+			line-height: 1.1rem;
+			font-size: 1rem;
+		}
+
+	#question {
+		text-align: center;
+	}
+
+		#question label {
+			display: block;
+			padding: 1.3rem 0 0;
+			font-size: 1rem;
+		}
+		
+			#question label span {
+				display: block;
+			}
+	
+			#question label input,
+			#question label select {
+				display: inline-block;
+				border: none;
+				background: none;
+				border-bottom: 2px solid #000;
+				font-family: Bemount, BemountLine, sans-serif;
+				font-size: 0.9rem;
+				text-align: center;
+				padding: 0 0.3rem;
+			}
+			
+			#question-qr, #qr {
+				display: none;
+			}
+
+	#next {
+		border: none;
+		background: none;
+		padding: 0 0.3rem;
+		border-bottom: 2px solid #000;
+		font-family: Bemount, BemountLine, sans-serif;
+		font-size: 1.2rem;
+		text-align: center;
+		text-transform: uppercase; 
+	}
+
+	#next:hover,
+	#next:active {
+		color: #d01a19;
+		border-color: #d01a19;
+	}
+
+/* STATUS */
+.content-table {
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+
+	.content-table header,
+	.content-table #content,
+	.content-table footer {
+		display: table-row;
+	}
+
+	.content-table header > div,
+	.content-table #content > div,
+	.content-table footer > div {
+		display: table-cell;
+		vertical-align: middle;
+	}
+
+	div.empty {
+		height: 43px;
+	}
