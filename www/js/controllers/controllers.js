@@ -12,8 +12,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 		task: 	''
 	};
 	
-	$scope.$on('$ionicView.enter', function(){
-	
+	$scope.$on('$ionicView.enter', function(){	
 		$scope.getContext();
 	});
 	
@@ -663,12 +662,12 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 								function(res){
 									var addNewPageQuery = 'INSERT INTO `scene-list` ("scene", "num", "task") VALUES (' + $scope.scene.id + ', ' + (maxNum+1) + ', ' + res.rows.item(0).id + ')';
 									$cordovaSQLite.execute(db, addNewPageQuery).then(
-											function(){
-												$scope.$emit('pageAdded');
-												$state.go('sceneEditor');
-											}, function(err){
-												error(err);
-											}
+										function(){
+											$scope.$emit('pageAdded');
+											$state.go('sceneEditor');
+										}, function(err){
+											error(err);
+										}
 									);
 								}, function(err){
 									error(err);
@@ -833,29 +832,30 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 					$scope.task.content = res.rows.item(0).content;
 					$scope.task.img = res.rows.item(0).img;
 				} 
+				SharedProps.setCurrTask($scope.task);
 // 				alert($scope.task.title + "\n" + $scope.task.content);
 // 					alert("task id: " + $scope.task.id);
-					var questionQuery = 'SELECT * FROM `questions` WHERE "task" = "' + $scope.task.id + '"';
-					
-	// 				alert("query for questions: " + questionQuery)
-					$cordovaSQLite.execute(db, questionQuery).then(
-						function(result){
-	// 						alert(result.rows.length);
-							if (result.rows.length > 0){
-								for (var i = 0; i < result.rows.length; i++){
-	// 								alert(result.rows.item(i).id + ' ' + result.rows.item(i).task);
-									$scope.questions.push({
-										id: 		result.rows.item(i).id,
-										task: 	result.rows.item(i).task,
-										number: 	result.rows.item(i).number,
-										type: 	result.rows.item(i).type,
-										question: 	result.rows.item(i).question
-									});
-								}
+				var questionQuery = 'SELECT * FROM `questions` WHERE "task" = "' + $scope.task.id + '"';
+				
+// 				alert("query for questions: " + questionQuery)
+				$cordovaSQLite.execute(db, questionQuery).then(
+					function(result){
+// 						alert(result.rows.length);
+						if (result.rows.length > 0){
+							for (var i = 0; i < result.rows.length; i++){
+// 								alert(result.rows.item(i).id + ' ' + result.rows.item(i).task + result.rows.item(i).question);
+								$scope.questions.push({
+									id: 		result.rows.item(i).id,
+									task: 	result.rows.item(i).task,
+									number: 	result.rows.item(i).number,
+									type: 	result.rows.item(i).type,
+									question: 	result.rows.item(i).question
+								});
 							}
-						}, function(err){
-							error(err);
-						});
+						}
+					}, function(err){
+						error(err);
+					});
 			
 				
 			}, function (err) {
@@ -911,6 +911,7 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 	
 	$scope.editQuestion = function(question){
 		SharedProps.setCurrQuestion(question);
+// 		alert("going to edit question of type " + question.type);
 		$ionicListDelegate.closeOptionButtons();
 		$state.go('questionEditor');
 	};
@@ -918,12 +919,12 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 	$scope.deleteQuestion = function(question){
 // 		alert("Trying to delete page #" + page.num);
 		if(confirm("Вы действительно хотите удалить вопрос " + question.number)){
-			var deleteQuestionQuery = 'DELETE from `questions` WHERE "task" = ' + question.task + ' AND "number" = ' + page.number;
+			var deleteQuestionQuery = 'DELETE from `questions` WHERE "id" = ' + question.id;
 			$cordovaSQLite.execute(db, deleteQuestionQuery).then(
 				function(){
-					$scope.questions.splice($scope.questions.indexOf(page), 1);
-					var updateQuestionsNumbers = 'UPDATE `questions` SET "number" = number - 1 WHERE "number" >' + question.number;
-					$cordovaSQLite.execute(db, updateQuestionssNumbers).then(
+					$scope.questions.splice($scope.questions.indexOf($scope.page), 1);
+					var updateQuestionsNumbers = 'UPDATE `questions` SET "number" = number - 1 WHERE "number" >' + question.number + ' AND "task" = ' + question.task;
+					$cordovaSQLite.execute(db, updateQuestionsNumbers).then(
 						function(){
 							$scope.$emit('questionAdded');
 						}, function(err){
@@ -961,8 +962,9 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 		$scope.openPage();
 	});
 	
-	$scope.$on('taskEdited', function(){
+	$rootScope.$on('taskEdited', function(){
 		$scope.task = [];
+		$scope.questions = [];
 		$scope.openPage();
 	})
 	
@@ -995,8 +997,8 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 	});
 });
 
-quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
-
+quest.controller('questionEditCtrl', function($rootScope, $scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
+	
 	$scope.answers = [];
 	
 	$scope.types = [
@@ -1007,11 +1009,21 @@ quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $i
 		{id: 4,
 		desc: "QR-код"}
 	];
+	$scope.selectedType = $scope.types[0];
+	$scope.validAnswer;
 	
 	$scope.openQuestion = function(){
 		$scope.question = SharedProps.getCurrQuestion();
 		$scope.page = SharedProps.getCurrPage();
-		alert("editing question # " + $scope.question.id + "\nat task #" + $scope.page.task);
+ 		if ($scope.question.type == 1)
+			$scope.selectedType = $scope.types[0];
+		else if ($scope.question.type == 2)
+			$scope.selectedType = $scope.types[1];
+		else if ($scope.question.type == 4) 
+			$scope.selectedType = $scope.types[2];
+		//else alert ("Smth went wrong | " + $scope.question.type + " | " + $scope.question.id);
+		
+		alert("editing question # " + $scope.question.id + " of type " + $scope.question.type +  "\nat task #" + $scope.page.task + "\nwith question: " + $scope.question.question);
 		var answerQuery = 'SELECT * FROM `answers` WHERE "question" = ' + $scope.question.id;
 		$cordovaSQLite.execute(db, answerQuery).then(
 			function(result){
@@ -1024,6 +1036,8 @@ quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $i
 							valid: result.rows.item(i).valid
 						});
 						alert("answer's id: " + $scope.answers[i].id + "\n question: " + $scope.answers[i].question + "\n answer: " + $scope.answers[i].answer);
+						if ($scope.answers[i].valid == 1)
+							$scope.validAnswer = $scope.answers[i];
 					}
 				}
 			}, function(err){
@@ -1032,13 +1046,64 @@ quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $i
 		);
 	}
 	
-	$scope.onTypeChange = function(question){
-		alert("changing question type...");
-		alert("new type: " + question.id + " " + question.type.id);
-		var typeUpdateQuery = 'UPDATE `questions` SET "type" = "' + question.type.id + '" WHERE "id" = ' + question.id;
+	$scope.onTypeChange = function(question, selected){
+		/*непонятная магия -- scope.selectedType не обновляется через ng-model, передаю как параметр функции*/
+		alert("Changed to: " + $scope.selectedType.id + "||" + selected.id + " Current type: " + question.type);
+		$scope.selectedType = selected;
+		//$scope.question.type = selected;
+		alert("changed type of question # " + question.id + " to type " + $scope.selectedType.id);
+// 		alert("1:" + question.type.id == 1);
+// 		alert(question.type.id == '1');
+// 		alert(question.type.id == "1");
+		var typeUpdateQuery = 'UPDATE `questions` SET "type" = "' + selected.id + '" WHERE "id" = ' + question.id;
+		if (selected.id == 2 && question.type != 2){
+			$scope.question.type == selected;
+			/*хитрый запрос для одновременной вставки двух новых вариантов ответа*/
+			var addAnswersQ = 'INSERT into `answers` ("question", "answer", "valid") SELECT "' + question.id + '" as "question", "Вариант 2" as "answer", 0  as "valid" UNION ALL SELECT "' + question.id + '", "Вариант 3", "0"';
+			
+			alert (addAnswersQ);
+			$cordovaSQLite.execute(db, addAnswersQ).then(
+				function(){},
+				function(err){
+					error(err);
+				}
+			);
+		}
+		if (question.type == 2 && selected.id != 2){
+			$scope.question.type == selected;
+			var minAnsId = 99999999;
+// 			var searchAnsQ = 'SELECT * FROM `answers` WHERE "question" = ' + question.id;
+// 			alert(searchAnsQ);
+// 			$cordovaSQLite.execute(db, searchAnsQ).then(
+// 				function(result){
+// 					alert ("found " + result.rows.length + " answers for question with id " + question.id);
+					for (var i = 0; i < $scope.answers.length; i++) {
+// 						alert(result.rows.item(i).id);
+						if ($scope.answers[i].id < minAnsId)
+							minAnsId = $scope.answers[i].id;
+					}
+					alert("Min ans ID for this question: " + minAnsId);
+					var setOneValidQ = 'UPDATE `answers` SET "valid" = 1 WHERE "id" = ' + minAnsId;
+					$cordovaSQLite.execute(db, setOneValidQ).then(
+						function(){
+							var clearAnsQ = 'DELETE FROM `answers` WHERE "question" = ' + question.id + ' AND "id" != ' + minAnsId;
+							alert (clearAnsQ);
+							$cordovaSQLite.execute(db, clearAnsQ);
+						}
+					);
+// 				}, function(err){
+// 					error(err);
+// 				}
+// 			);
+			
+		}
+		
+		alert(typeUpdateQuery);
+		
 		$cordovaSQLite.execute(db, typeUpdateQuery).then(
 			function(){
 				$scope.answers=[];
+				SharedProps.setCurrQuestion(question);
 				$scope.openQuestion();
 				$state.reload();
 			}, function (err){
@@ -1047,29 +1112,49 @@ quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $i
 		);
 	}
 	
+	$scope.onValidChange = function (question, ans){	
+// 		alert ("Ans has " + Object.keys(ans).length + " fields");
+		alert ("Selected answer '" + ans.answer + "' as valid");
+		
+		for (var i = 0; i < $scope.answers.length; i++){
+			if ($scope.answers[i].id == ans.id)
+				$scope.answers[i].valid = 1;
+			else
+				$scope.answers[i].valid = 0;
+// 			var updateValidAns = 'UPDATE `answers` SET "valid" = ' + $scope.answers[i].valid + ' WHERE "id" = ' + $scope.answers[i].id;
+// 			$cordovaSQLite.execute(db, updateValidAns);
+		}
+	}
+	
 	$scope.$on('$ionicView.unloaded', function(){
 		var checkAnswersQ = 'SELECT * FROM `questions` WHERE "id" = ' + $scope.question.id;
 		$cordovaSQLite.execute(db, checkAnswersQ).then(
 			function(result){
-				var currType = result.rows.item(0).type;
+// 				var currType = result.rows.item(0).type;
 				var currQuestion = result.rows.item(0).question;
-				var updateQuestionQ = 'UPDATE `questions` SET "type" = "' + $scope.question.type.id + '", "question" = "' + $scope.question.question + '"';
-				if (currType != $scope.question.type || currQuestion != $scope.question.question){
+				var updateQuestionQ = 'UPDATE `questions` SET "question" = "' + $scope.question.question + '" WHERE "id" = "' + $scope.question.id + '"';
+				
+				if (currQuestion != $scope.question.question){
 					alert ("updating question info: " + updateQuestionQ);
 					$cordovaSQLite.execute(db, updateQuestionQ).then(
 						function(){
 							alert("question was updated");
+					/*нужно для обновления сути вопроса в форме*/
+							$rootScope.$emit("taskEdited");
 						}, function(err){
 							error(err);
 						}
 					);
 				}
+				
+				
 			}, function(err){
 				error(err);
 			}
 		);
 		
 		var checkQuestionsQ = 'SELECT * FROM `answers` WHERE "question" = ' + $scope.question.id;
+		var updated = false;
 		$cordovaSQLite.execute(db, checkQuestionsQ).then(
 			function(result){
 				for (var i = 0; i < result.rows.length; i++){
@@ -1077,24 +1162,31 @@ quest.controller('questionEditCtrl', function($scope, $state, $cordovaSQLite, $i
 					var currAnswer = result.rows.item(i).answer;
 					var currValid = result.rows.item(i).valid;
 					alert("curr question: id = " + currId + "\nanswer: " + currAnswer + "\nvalid: " + currValid );
+					
 					var updateAnswersQuery = 'UPDATE `answers` SET "answer" = "' + $scope.answers[i].answer + '", "valid" = "' + $scope.answers[i].valid + '" WHERE "id" = ' + $scope.answers[i].id;
+					
 					if (currAnswer != $scope.answers[i].answer || currValid != $scope.answers[i].valid){
 						alert("updating current question... \n query: " + updateAnswersQuery);
 						$cordovaSQLite.execute(db, updateAnswersQuery).then(
 							function() {
-								alert("answer(s) were updated");
+								updated = true;
+							//	alert("answer(s) were updated");
 							},
 							function(err){
 								error(err);
 							}		
 						);
-					} else {
-						alert("No need to refresh answers");
-					}
+					} 
+// 					else {
+// 						alert("No need to refresh answers");
+// 					}
 				}
+				if (updated)
+					alert("answer(s) were updated");
+				else 
+					alert("No need to refresh answers");
 			}
 		);
-		
 		
 	});
 });

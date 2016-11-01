@@ -3,7 +3,7 @@
 		<ion-header-back-button>
 		</ion-header-back-button>
 	</div>
-		<h1 class="title">{{"Страница" + question.task + ". Вопрос " + question.number}}</h1>
+		<h1 class="title">{{"Страница " + question.task + ". Вопрос " + question.number}}</h1>
 </ion-header-bar>
 <ion-view view-title="Question Editor" name="QuestionEdit" ng-init=openQuestion()>
 <ion-content class="padding">
@@ -25,46 +25,53 @@
 			</label>-->
 			<div class="item item-stacked-label">
 				<ion-list>
+					<span>Доступные типы вопросов: </span>
 					<ion-item ng-repeat="type in types">
 						<span>Тип вопроса: {{type.id}} -- {{type.desc}}</span>
 					</ion-item>
 				</ion-list>
 			</div>
-			<select ng-model="question.type" ng-options="type.id for type in types" ng-change="onTypeChange(question)">
-				<!--<option ng-repeat="type in types" value="type.id">{{type.id + ' (' + type.desc + ')'}}</option>-->
-			</select>
+			<div>
+				<label> Тип вопроса: 
+					<select ng-model="selectedType" ng-options="type.id for type in types" ng-change="onTypeChange(question, selectedType)">
+						<!--<option ng-repeat="type in types" value="type.id">{{type.id + ' (' + type.desc + ')'}}</option>-->
+					</select>
+				</label>
+			</div>
 <!-- 				 **1/3. Обработка простого текстового вопроса или qr-кода. **-->
 			
 					<label class="item item-input item-stacked-label">
 						<span class="input-label">Вопрос:</span>
 						<input type="text" placeholder={{question.question}} ng-model="question.question">
 					</label>
+					
 					<ion-list>
 						<ion-item ng-repeat="answer in answers">
-							<label ng-show="question.type == 1 || question.type == 4" class="item item-input item-stacked-label">
+							<label class="item item-input item-stacked-label" ng-show="selectedType.id == '1' || selectedType.id == '4'" >
 								<span class="input-label">Ответ:</span>
 								<input type="text" placeholder={{answer.answer}} ng-model="answer.answer">
 							</label>
 			
 <!-- 				 **2. Обработка 3 по 3-->
 					
-							<label ng-show="question.type == 3" class="item item-input item-stacked-label">
+							<label class="item item-input item-stacked-label" ng-show="selectedType.id == '2'">
 								<span class="input-label">{{"Ответ " + ($index + 1)}}</span>
 								<input type="text" placeholder={{answer.answer}} ng-model="answer.answer">
 							</label>
 						</ion-item>
+						
+						<label ng-show="selectedType.id == '2'">
+							<div class="input-label">
+								Правильный ответ:
+							</div>
+						<!-- обозначим "a" как каждый ответ из массива объектов 'answers' -->
+							<select  ng-options="a.answer for a in answers" ng-model="validAnswer"
+							ng-change="onValidChange(question, validAnswer)">
+								<!--<option ng-repeat="answer in answers" value="{{answer.answer}}">{{answer.answer}}
+								</option>-->
+							</select>
+						</label>
 					</ion-list>
-					<label ng-if="question.type == 3" class="item item-input item-select">
-						<div class="input-label">
-							Правильный ответ:
-						</div>
-						<select ng-model="answer.valid">
-							<option ng-repeat="answer in answers" value="{{answer.answer}}">{{answer.answer}}</option>
-							
-						</select>
-					</label>
-			
-			
 		</div>
 	</div>
 </ion-content>
