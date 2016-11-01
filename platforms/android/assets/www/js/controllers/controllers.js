@@ -800,7 +800,7 @@ quest.controller("sceneEditCtrl", function($rootScope, $scope, $state, $cordovaS
 	
 });
 
-quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQLite, $ionicListDelegate, SharedProps){
+quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQLite, $ionicListDelegate, $q, SharedProps){
 // 	$scope.page = SharedProps.getCurrPage();
 	$scope.task = {
 		id: 		'',
@@ -816,6 +816,33 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 		//отображение кнопки удаления по умолчанию
 		showDelete: false
 	};
+	
+	$scope.loadQuestions = function(){
+		var deferred = $q.defer();
+		$scope.questions = [];
+		var questionQuery = 'SELECT * FROM `questions` WHERE "task" = "' + $scope.task.id + '"';
+			$cordovaSQLite.execute(db, questionQuery).then(
+				function(result){
+		// 						alert(result.rows.length);
+					if (result.rows.length > 0){
+						for (var i = 0; i < result.rows.length; i++){
+		// 								alert(result.rows.item(i).id + ' ' + result.rows.item(i).task + result.rows.item(i).question);
+							$scope.questions.push({
+								id: 		result.rows.item(i).id,
+								task: 	result.rows.item(i).task,
+								number: 	result.rows.item(i).number,
+								type: 	result.rows.item(i).type,
+								question: 	result.rows.item(i).question
+							});
+						}
+					}
+					alert("question (re)loaded");
+					deferred.resolve();
+				}, function(err){
+					error(err);
+				});
+			return deferred.promise;
+	}
 	
 // 	**opens page's details (task)**
 	$scope.openPage = function(){
@@ -835,35 +862,13 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 				SharedProps.setCurrTask($scope.task);
 // 				alert($scope.task.title + "\n" + $scope.task.content);
 // 					alert("task id: " + $scope.task.id);
-				var questionQuery = 'SELECT * FROM `questions` WHERE "task" = "' + $scope.task.id + '"';
-				
-// 				alert("query for questions: " + questionQuery)
-				$cordovaSQLite.execute(db, questionQuery).then(
-					function(result){
-// 						alert(result.rows.length);
-						if (result.rows.length > 0){
-							for (var i = 0; i < result.rows.length; i++){
-// 								alert(result.rows.item(i).id + ' ' + result.rows.item(i).task + result.rows.item(i).question);
-								$scope.questions.push({
-									id: 		result.rows.item(i).id,
-									task: 	result.rows.item(i).task,
-									number: 	result.rows.item(i).number,
-									type: 	result.rows.item(i).type,
-									question: 	result.rows.item(i).question
-								});
-							}
-						}
-					}, function(err){
-						error(err);
-					});
-			
-				
+				var promise = $scope.loadQuestions();				
 			}, function (err) {
 					error(err);
 			}
 			
 		);
-	}
+	}	
 	
 	$scope.addNewQuestion = function(){
 		var query = 'SELECT * from `questions` WHERE "task" = "' + $scope.task.id + '"';
@@ -910,10 +915,19 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 	};
 	
 	$scope.editQuestion = function(question){
-		SharedProps.setCurrQuestion(question);
-// 		alert("going to edit question of type " + question.type);
-		$ionicListDelegate.closeOptionButtons();
-		$state.go('questionEditor');
+		var promise = $scope.loadQuestions();
+		promise.then(function(){
+			alert("got there first, lol");
+			for (var i = 0; i < $scope.questions.length; i++){
+				if ($scope.questions[i].id == question.id)
+					question = $scope.questions[i];
+			}
+			SharedProps.setCurrQuestion(question);
+	// 		alert("going to edit question of type " + question.type);
+			$ionicListDelegate.closeOptionButtons();
+			$state.go('questionEditor');
+		});
+	
 	};
 	
 	$scope.deleteQuestion = function(question){
@@ -1103,6 +1117,8 @@ quest.controller('questionEditCtrl', function($rootScope, $scope, $state, $cordo
 		$cordovaSQLite.execute(db, typeUpdateQuery).then(
 			function(){
 				$scope.answers=[];
+				question.type = selected.id;
+				alert("gonna update current question type to " + selected.id);
 				SharedProps.setCurrQuestion(question);
 				$scope.openQuestion();
 				$state.reload();
@@ -1140,14 +1156,16 @@ quest.controller('questionEditCtrl', function($rootScope, $scope, $state, $cordo
 						function(){
 							alert("question was updated");
 					/*нужно для обновления сути вопроса в форме*/
+						//	$scope.answers=[];
+// 							SharedProps.setCurrQuestion(question);
+						//	$scope.openQuestion();
 							$rootScope.$emit("taskEdited");
+						//	$state.reload();
 						}, function(err){
 							error(err);
 						}
 					);
 				}
-				
-				
 			}, function(err){
 				error(err);
 			}
