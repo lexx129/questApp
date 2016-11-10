@@ -26,9 +26,10 @@
 				</label>
 				<label class="item item-input item-stacked-label">
 					<span class="input-label">Содержимое:</span>
-					<input type="text" placeholder={{task.content}} 
-					ng-model="task.content">
+					<textarea id="pageCont" ng-keyup="textAreaAdjust()" ng-change="textAreaAdjust()" style="overflow:visible" placeholder={{task.content}} 
+					ng-model="task.content"></textarea>
 				</label>
+				
 				<div>
 				<h3 ng-show="questions.length == 0" align="center">На этой странице пока нет вопросов!</h3>
 				<h3 ng-show="questions.length != 0">Список вопросов: </h3>

@@ -191,7 +191,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 					);
 					break;
 
-				case 2 ://CHECKBOX 
+				case 3 ://CHECKBOX (unused) 
 					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id + ' AND `valid` = "1";';
 					var question = {"id": id};
 					$cordovaSQLite.execute(db, query).then(
@@ -206,7 +206,7 @@ quest.controller('QuestCtrl', function ($scope, $state, $cordovaSQLite, $ionicPl
 					);
 					break;
 					
-				case 3 :// SELECT
+				case 2 :// SELECT
 					var query = 'SELECT * FROM `answers` WHERE `question` = ' + id;
 					$cordovaSQLite.execute(db, query).then(
 						function (result) {
@@ -836,7 +836,7 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 							});
 						}
 					}
-					alert("question (re)loaded");
+// 					alert("question (re)loaded");
 					deferred.resolve();
 				}, function(err){
 					error(err);
@@ -917,7 +917,7 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 	$scope.editQuestion = function(question){
 		var promise = $scope.loadQuestions();
 		promise.then(function(){
-			alert("got there first, lol");
+// 			alert("got there first, lol");
 			for (var i = 0; i < $scope.questions.length; i++){
 				if ($scope.questions[i].id == question.id)
 					question = $scope.questions[i];
@@ -971,6 +971,12 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 		alert(updateFirst + '\n *** \n' + updateSecond);
 	};
 	
+	$scope.textAreaAdjust = function() {
+		var element = document.getElementById("pageCont");
+		element.style.height = 'auto';
+		element.style.height = (element.scrollHeight) + 'px';
+	};
+	
 	$scope.$on('questionAdded', function(){
 		$scope.questions = [];
 		$scope.openPage();
@@ -980,7 +986,11 @@ quest.controller("pageEditCtrl", function($rootScope, $scope, $state, $cordovaSQ
 		$scope.task = [];
 		$scope.questions = [];
 		$scope.openPage();
-	})
+	});
+	
+	$scope.$on('$ionicView.afterEnter', function(){
+		$scope.textAreaAdjust();
+	});
 	
 	$scope.$on('$ionicView.unloaded', function(){
 		var checkQuery = 'SELECT * FROM `tasks` WHERE "id" = ' + $scope.task.id;
