@@ -1,6 +1,6 @@
 var db = null,
     sqlplugin = null,
-    UTCShift = 3*60*60,
+    UTCShift = -(new Date().getTimezoneOffset()) * 60,
     timerStart = false,
     answerChecked = {"correct" : false, "checked" : false};
 //     scene = {"name": "", "currentTask": 0, "id": 0, "startTime": 0, "endTime": 0, "task": 0};

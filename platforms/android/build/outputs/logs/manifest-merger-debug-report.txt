@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:1-35:12
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:1-37:12
 	android:hardwareAccelerated
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:2:11-45
 	xmlns:android
@@ -36,7 +36,7 @@ ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml
 	android:name
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:4:22-64
 application
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:5:5-30:19
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:5:5-31:19
 	android:supportsRtl
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:5:116-142
 	android:label
@@ -119,24 +119,36 @@ action#android.intent.action.VIEW
 ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:26:17-69
 	android:name
 		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:26:25-66
+activity#com.synconset.MultiImageChooserActivity
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:30:9-163
+	android:label
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:30:19-57
+	android:theme
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:30:113-160
+	android:name
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:30:58-112
 uses-sdk
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:31:5-74
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:32:5-74
 MERGED from [android:CordovaLib:unspecified:debug] /home/lexx/ionicApps/someSQLapp/platforms/android/build/intermediates/exploded-aar/android/CordovaLib/unspecified/debug/AndroidManifest.xml:25:5-44
 	android:targetSdkVersion
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:31:42-71
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:32:42-71
 	android:minSdkVersion
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:31:15-41
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:32:15-41
 uses-permission#android.permission.CAMERA
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:32:5-65
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:33:5-65
 	android:name
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:32:22-62
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:33:22-62
 uses-permission#android.permission.FLASHLIGHT
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:33:5-69
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:34:5-69
 	android:name
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:33:22-66
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:34:22-66
 uses-feature#android.hardware.camera
-ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:34:5-85
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:35:5-85
 	android:required
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:34:58-82
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:35:58-82
 	android:name
-		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:34:19-57
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:35:19-57
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:36:5-81
+	android:name
+		ADDED from /home/lexx/ionicApps/someSQLapp/platforms/android/AndroidManifest.xml:36:22-78

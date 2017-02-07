@@ -88,6 +88,10 @@
     <string name="contents_phone">Phone number</string>
     <string name="contents_sms">SMS address</string>
     <string name="contents_text">Plain text</string>
+    <string name="discard">Cancel</string>
+    <string name="done">OK</string>
+    <string name="error_database">There was an error opening the images database. Please report the problem.</string>
+    <string name="free_version_label">Free version - Images left: %d</string>
     <string name="history_clear_one_history_text">Clear</string>
     <string name="history_clear_text">Clear history</string>
     <string name="history_email_title">Barcode Scanner history</string>
@@ -96,6 +100,8 @@
     <string name="history_send">Send history</string>
     <string name="history_title">History</string>
     <string name="launcher_name">@string/app_name</string>
+    <string name="maximum_selection_count_error_header">Limit reached</string>
+    <string name="maximum_selection_count_error_message">You can only select %d photos at once.</string>
     <string name="menu_encode_mecard">Use MECARD</string>
     <string name="menu_encode_vcard">Use vCard</string>
     <string name="menu_help">Help</string>
@@ -129,6 +135,7 @@
     <string name="msg_share_text">Or type some text and press Enter</string>
     <string name="msg_sure">Are you sure?</string>
     <string name="msg_unmount_usb">Sorry, the SD card is not accessible.</string>
+    <string name="multi_app_name">MultiImageChooser</string>
     <string name="preferences_actions_title">When a barcode is found\u2026</string>
     <string name="preferences_auto_focus_title">Use auto focus</string>
     <string name="preferences_bulk_mode_summary">Scan and save many barcodes continuously</string>
@@ -158,6 +165,9 @@
     <string name="preferences_try_bsplus">Try Barcode Scanner+</string>
     <string name="preferences_try_bsplus_summary">Enhanced with new features and interface</string>
     <string name="preferences_vibrate_title">Vibrate</string>
+    <string name="processing_images_header">Processing Images</string>
+    <string name="processing_images_message">This may take a few moments</string>
+    <string name="requesting_thumbnails">Requesting thumbnails, please be patient</string>
     <string name="result_address_book">Found contact info</string>
     <string name="result_calendar">Found calendar event</string>
     <string name="result_email_address">Found email address</string>
@@ -174,4 +184,6 @@
     <string name="wifi_changing_network">Requesting connection to network\u2026</string>
     <string name="wifi_ssid_label">Network Name</string>
     <string name="wifi_type_label">Type</string>
+    <style name="MyTheme" parent="android:Theme.Holo.Light">
+    </style>
 </resources>

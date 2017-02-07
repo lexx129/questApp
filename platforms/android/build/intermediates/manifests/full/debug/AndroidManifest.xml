@@ -25,6 +25,8 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:hardwareAccelerated="true"
         android:icon="@drawable/icon"
@@ -74,6 +76,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.synconset.MultiImageChooserActivity"
+            android:label="@string/multi_app_name"
+            android:theme="@android:style/Theme.Holo.Light" />
     </application>
 
 </manifest>

@@ -15,9 +15,7 @@
 	<ion-content class="padding">
 		<div>
 			<h3>Содержимое страницы: </h3>
-			<!--<br>
 			
-			Список страниц:</p1>-->
 			<div class="list">
 				<label class="item item-input item-stacked-label">
 					<span class="input-label">Заголовок:</span>
@@ -28,6 +26,15 @@
 					<span class="input-label">Содержимое:</span>
 					<textarea id="pageCont" ng-keyup="textAreaAdjust()" ng-change="textAreaAdjust()" style="overflow:visible" placeholder={{task.content}} 
 					ng-model="task.content"></textarea>
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">Иллюстрация:</span>
+					<div>
+						<img ng-show="task.img" ng-src="{{task.img}}" height="100"/>
+					</div>	
+					<button ng-click="getImage()">
+						Выбрать изображение
+					</button>
 				</label>
 				
 				<div>
@@ -51,7 +58,6 @@
 	</ion-content>
 	<ion-footer-bar align-title="center" class="bar-balanced">
 		<div class="buttons">
-		<!--**This button needs to be centered in the footer**-->
 			<button class="button button-stable icon icon-left ion-plus" ng-click="addNewQuestion()">Добавить вопрос</button>
 		</div>
 	</ion-footer-bar>

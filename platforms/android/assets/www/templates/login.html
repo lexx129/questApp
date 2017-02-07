@@ -1,24 +1,16 @@
 <ion-view view-title="Введите имя пользователя" name="login-view"  style="width: 70%; margin: 0 auto;">
-	<p1>
-		Войдите в систему:
-	</p1>
-	<form class="" name="form.loginForm">
-		<ion-content class="padding">
-		<!--<div ng-controller="LoginCtrl">-->
-		<div class="list list-inset">
-		
+	<ion-content style="overflow-y: hidden; position: relative;">
+		<div class="list list-inset" style="position: absolute; width: 100%; top: 50%; margin: -5rem 0 0;">
+			<h1>
+				Войдите в систему:
+			</h1>
 			<label class="item item-input">
-				<input name="login" type="text" placeholder="Имя пользователя" 
-				ng-model="user.username" >
+				<input name="login" type="text" placeholder="Имя пользователя" ng-model="user.username" >
 			</label>
 			<label name="password" class="item item-input">
-				<input type="password" placeholder="Пароль" 
-				ng-model="user.password">
+				<input type="password" placeholder="Пароль" ng-model="user.password">
 			</label>
-		<form>
+			<button class="button button-block button-calm" ng-click="login()" >Войти</button>
 		</div>
-	<button class="button button-block button-calm" 
-	ng-click="login()" >Войти</button>
-	<!--</div>-->
 	</ion-content>
 </ion-view>
